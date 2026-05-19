@@ -1,114 +1,174 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>萬能考場作文：理論與實作</title>
-  <style>
-    body {
-      font-family: "Noto Sans TC", Arial, sans-serif;
-      margin: 0;
-      background: #f7f7f7;
-      color: #222;
-      line-height: 1.8;
-    }
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #d1a15d);
+  transform: translateY(-50%);
+}
 
-    header {
-      background: #222;
-      color: white;
-      padding: 80px 20px;
-      text-align: center;
-    }
+.timeline {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 
-    header h1 {
-      font-size: 40px;
-      margin-bottom: 10px;
-    }
+.timeline-item {
+  position: relative;
+  overflow: hidden;
+}
 
-    header p {
-      font-size: 18px;
-      color: #ddd;
-    }
+.timeline-item::after {
+  content: "";
+  position: absolute;
+  inset: auto auto 0 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--brand), var(--accent));
+}
 
-    main {
-      max-width: 900px;
-      margin: 40px auto;
-      padding: 0 20px;
-    }
+.quote-card {
+  position: relative;
+  padding-top: 38px;
+}
 
-    section {
-      background: white;
-      padding: 30px;
-      margin-bottom: 24px;
-      border-radius: 16px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-    }
+.quote-card::before {
+  content: "“";
+  position: absolute;
+  top: 14px;
+  left: 22px;
+  font-family: "Newsreader", serif;
+  font-size: 3rem;
+  line-height: 1;
+  color: rgba(28, 75, 130, 0.18);
+}
 
-    h2 {
-      margin-top: 0;
-      border-left: 5px solid #222;
-      padding-left: 12px;
-    }
+.quote-card footer {
+  margin-top: 18px;
+  color: var(--text);
+  font-weight: 700;
+}
 
-    .button {
-      display: inline-block;
-      background: #222;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 999px;
-      text-decoration: none;
-      margin-top: 10px;
-    }
+.faq-wrap {
+  max-width: 900px;
+}
 
-    footer {
-      text-align: center;
-      color: #777;
-      padding: 40px 20px;
-    }
-  </style>
-</head>
-<body>
+.faq-list {
+  display: grid;
+  gap: 16px;
+}
 
-  <header>
-    <h1>KH Lin</h1>
-    <p>國寫教學｜社會議題觀察｜作品集</p>
-  </header>
+.faq-list details {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.94);
+  padding: 18px 22px;
+}
 
-  <main>
-    <section>
-      <h2>關於我</h2>
-      <p>
-        我是 KH Lin，這裡會整理我的教學理念、學生回饋、研究作品與公開發表內容。
-      </p>
-    </section>
+.faq-list summary {
+  cursor: pointer;
+  font-weight: 700;
+  list-style: none;
+}
 
-    <section>
-      <h2>國寫教學</h2>
-      <p>
-        我相信作文不是只靠天賦或運氣，而是可以透過架構、素材轉化與審題訓練穩定進步。
-      </p>
-      <a class="button" href="#">查看課程介紹</a>
-    </section>
+.faq-list summary::-webkit-details-marker {
+  display: none;
+}
 
-    <section>
-      <h2>作品集</h2>
-      <p>
-        這裡可以放簡報、研究報告、文章、講座紀錄與其他作品。
-      </p>
-    </section>
+.faq-list summary::after {
+  content: "+";
+  float: right;
+  color: var(--brand);
+  font-size: 1.25rem;
+  line-height: 1;
+}
 
-    <section>
-      <h2>聯絡我</h2>
-      <p>
-        歡迎透過 Email、Instagram 或 LINE 與我聯繫。
-      </p>
-    </section>
-  </main>
+.faq-list details[open] summary::after {
+  content: "−";
+}
 
-  <footer>
-    © 2026 KH Lin
-  </footer>
+.faq-list details p {
+  padding-top: 12px;
+}
 
-  
-</body>
-</html>
+.contact-section {
+  padding-top: 52px;
+}
+
+.contact-card {
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+  padding: 34px;
+  background:
+    linear-gradient(135deg, rgba(28, 75, 130, 0.08), rgba(184, 135, 70, 0.12)),
+    rgba(255, 255, 255, 0.94);
+}
+
+.site-footer {
+  padding: 24px 0 36px;
+}
+
+.footer-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+@media (max-width: 960px) {
+  .three-up,
+  .feature-grid,
+  .timeline,
+  .audience-layout,
+  .contact-card {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-wrap,
+  .footer-wrap {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    padding: 14px 0;
+  }
+
+  .site-nav {
+    gap: 14px;
+  }
+
+  .hero-content {
+    padding-top: 148px;
+  }
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding: 72px 0;
+  }
+
+  .hero {
+    min-height: 92vh;
+    background-position: center center;
+  }
+
+  .hero-description {
+    font-size: 0.98rem;
+  }
+
+  .button {
+    width: 100%;
+  }
+
+  .hero-actions,
+  .contact-actions {
+    flex-direction: column;
+  }
+
+  .info-card,
+  .feature-card,
+  .audience-panel,
+  .timeline-item,
+  .quote-card,
+  .contact-card,
+  .faq-list details {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
