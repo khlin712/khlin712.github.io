@@ -1,174 +1,257 @@
-  height: 12px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), #d1a15d);
-  transform: translateY(-50%);
-}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>萬能考場作文：理論與實作</title>
+    <meta
+      name="description"
+      content="150天，搶救學測國寫。一頁式個人品牌與課程招生網站範本。"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Newsreader:opsz,wght@6..72,600;6..72,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="brand" href="#top">萬能考場作文</a>
+        <nav class="site-nav" aria-label="主選單">
+          <a href="#pain-points">痛點</a>
+          <a href="#method">教學方法</a>
+          <a href="#curriculum">課程內容</a>
+          <a href="#faq">FAQ</a>
+          <a href="#contact">報名</a>
+        </nav>
+      </div>
+    </header>
 
-.timeline {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
+    <main id="top">
+      <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="container hero-content">
+          <p class="eyebrow">國寫備戰專班</p>
+          <h1>萬能考場作文：理論與實作</h1>
+          <p class="hero-subtitle">150天，搶救學測國寫</p>
+          <p class="hero-description">
+            用有系統的訓練，把抽象的寫作能力拆成可練習、可檢核、可穩定進步的步驟。
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#curriculum">了解課程</a>
+            <a class="button button-secondary" href="#contact">立即諮詢</a>
+          </div>
+        </div>
+      </section>
 
-.timeline-item {
-  position: relative;
-  overflow: hidden;
-}
+      <section class="section intro">
+        <div class="container section-heading">
+          <p class="section-kicker">寫作不是天分競賽</p>
+          <h2>為高中生與家長設計的清楚學習路線</h2>
+          <p>
+            這個頁面已經為你保留完整架構，你之後只要把每個區塊的文字內容替換成自己的版本即可。
+          </p>
+        </div>
+      </section>
 
-.timeline-item::after {
-  content: "";
-  position: absolute;
-  inset: auto auto 0 0;
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(90deg, var(--brand), var(--accent));
-}
+      <section class="section" id="pain-points">
+        <div class="container">
+          <div class="section-heading">
+            <p class="section-kicker">學生常見痛點</p>
+            <h2>把最卡關的問題先說清楚</h2>
+            <p>你可以在下方卡片中填入學生最常遇到的寫作困難、模考挫折或家長焦慮。</p>
+          </div>
+          <div class="card-grid three-up">
+            <article class="info-card">
+              <span class="card-index">01</span>
+              <h3>不知道怎麼起筆</h3>
+              <p>可替換成你的內容：例如審題慢、發想亂、開頭沒有方向，寫到一半就卡住。</p>
+            </article>
+            <article class="info-card">
+              <span class="card-index">02</span>
+              <h3>寫得很多卻拿不到分</h3>
+              <p>可替換成你的內容：例如內容零散、層次不足、例子不精準，難以回應評分標準。</p>
+            </article>
+            <article class="info-card">
+              <span class="card-index">03</span>
+              <h3>練習很努力但進步不穩定</h3>
+              <p>可替換成你的內容：例如不知道如何修稿、缺少回饋機制、每次作文都像重新開始。</p>
+            </article>
+          </div>
+        </div>
+      </section>
 
-.quote-card {
-  position: relative;
-  padding-top: 38px;
-}
+      <section class="section section-alt" id="method">
+        <div class="container">
+          <div class="section-heading">
+            <p class="section-kicker">我的教學方法</p>
+            <h2>從觀念建立到實戰演練</h2>
+            <p>這裡適合放你的教學理念、批改方式、陪跑節奏與跟一般作文班不同之處。</p>
+          </div>
+          <div class="feature-grid">
+            <article class="feature-card">
+              <h3>拆解評分邏輯</h3>
+              <p>可填入你如何把抽象評分標準轉成學生能理解的具體策略。</p>
+            </article>
+            <article class="feature-card">
+              <h3>建立穩定模板</h3>
+              <p>可填入你如何協助學生建立題型應對框架、論證骨架與段落節奏。</p>
+            </article>
+            <article class="feature-card">
+              <h3>反覆練習修正</h3>
+              <p>可填入批改流程、作業設計、回饋頻率，以及如何追蹤學生進步。</p>
+            </article>
+          </div>
+        </div>
+      </section>
 
-.quote-card::before {
-  content: "“";
-  position: absolute;
-  top: 14px;
-  left: 22px;
-  font-family: "Newsreader", serif;
-  font-size: 3rem;
-  line-height: 1;
-  color: rgba(28, 75, 130, 0.18);
-}
+      <section class="section" id="audience">
+        <div class="container">
+          <div class="section-heading">
+            <p class="section-kicker">適合對象</p>
+            <h2>哪些學生特別適合加入</h2>
+            <p>可在這裡說明適合的年級、程度、需求與家長最在意的狀況。</p>
+          </div>
+          <div class="audience-layout">
+            <div class="audience-panel">
+              <h3>適合這樣的你</h3>
+              <ul class="check-list">
+                <li>想提升學測國寫成績，但不知道該從哪裡開始</li>
+                <li>已經練過作文，卻覺得分數起伏很大</li>
+                <li>希望有人帶著拆題、發想、寫作與修稿</li>
+                <li>想在有限時間內建立穩定應試能力</li>
+              </ul>
+            </div>
+            <div class="audience-panel highlight-panel">
+              <h3>家長也能放心掌握</h3>
+              <p>
+                可填入課程進度追蹤、回饋方式、作業安排與家長如何了解孩子目前的準備狀況。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-.quote-card footer {
-  margin-top: 18px;
-  color: var(--text);
-  font-weight: 700;
-}
+      <section class="section section-alt" id="curriculum">
+        <div class="container">
+          <div class="section-heading">
+            <p class="section-kicker">課程內容</p>
+            <h2>把 150 天規劃成看得見的進步節奏</h2>
+            <p>你可以把這裡改成完整課綱、堂數安排、每階段目標與作業形式。</p>
+          </div>
+          <div class="timeline">
+            <article class="timeline-item">
+              <span class="timeline-step">Phase 1</span>
+              <h3>基礎觀念建立</h3>
+              <p>可填入審題、立意、結構、素材整理等基礎能力訓練。</p>
+            </article>
+            <article class="timeline-item">
+              <span class="timeline-step">Phase 2</span>
+              <h3>題型拆解與實作</h3>
+              <p>可填入不同題型策略、範文分析、段落寫作與限時練習。</p>
+            </article>
+            <article class="timeline-item">
+              <span class="timeline-step">Phase 3</span>
+              <h3>模考衝刺與修正</h3>
+              <p>可填入模擬實戰、個別回饋、弱點修補與考前整理。</p>
+            </article>
+          </div>
+        </div>
+      </section>
 
-.faq-wrap {
-  max-width: 900px;
-}
+      <section class="section" id="testimonials">
+        <div class="container">
+          <div class="section-heading">
+            <p class="section-kicker">學生回饋</p>
+            <h2>把真實改變放在這裡</h2>
+            <p>你可以放入學生心得、分數成長、家長回應，或課前課後的具體變化。</p>
+          </div>
+          <div class="card-grid three-up">
+            <blockquote class="quote-card">
+              <p>「這裡可替換成學生回饋內容，建議保留 2 至 4 句，閱讀節奏會比較舒服。」</p>
+              <footer>學生 A｜高三</footer>
+            </blockquote>
+            <blockquote class="quote-card">
+              <p>「這裡可替換成家長回饋內容，加入具體改變會更有說服力。」</p>
+              <footer>家長 B</footer>
+            </blockquote>
+            <blockquote class="quote-card">
+              <p>「這裡可替換成分數進步或寫作心態轉變的內容。」</p>
+              <footer>學生 C｜模考進步案例</footer>
+            </blockquote>
+          </div>
+        </div>
+      </section>
 
-.faq-list {
-  display: grid;
-  gap: 16px;
-}
+      <section class="section section-alt" id="faq">
+        <div class="container faq-wrap">
+          <div class="section-heading">
+            <p class="section-kicker">常見問題 FAQ</p>
+            <h2>先把家長與學生最常問的整理好</h2>
+            <p>這裡已先做好展開式問答，後續你只要改文字就能直接使用。</p>
+          </div>
+          <div class="faq-list">
+            <details>
+              <summary>課程是實體還是線上？</summary>
+              <p>可替換成你的實際授課形式、上課平台、錄影回看規則與補課安排。</p>
+            </details>
+            <details>
+              <summary>沒有寫作基礎也適合嗎？</summary>
+              <p>可替換成適合程度、前測方式、班型安排與你的建議。</p>
+            </details>
+            <details>
+              <summary>每週需要投入多少時間？</summary>
+              <p>可替換成上課時數、作業量、練習頻率與建議讀書節奏。</p>
+            </details>
+            <details>
+              <summary>家長可以如何了解學習狀況？</summary>
+              <p>可替換成回饋機制、進度追蹤與聯繫方式。</p>
+            </details>
+          </div>
+        </div>
+      </section>
 
-.faq-list details {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.94);
-  padding: 18px 22px;
-}
+      <section class="section contact-section" id="contact">
+        <div class="container contact-card">
+          <div class="contact-copy">
+            <p class="section-kicker">聯絡與報名</p>
+            <h2>準備好開始，就從一次諮詢開始</h2>
+            <p>
+              這裡可以放入你的報名流程、聯絡方式、表單連結、LINE、Email
+              或社群帳號。
+            </p>
+          </div>
+          <div class="contact-actions">
+            <a class="button button-primary" href="#curriculum">了解課程</a>
+            <a class="button button-secondary" href="mailto:hello@example.com">立即諮詢</a>
+          </div>
+        </div>
+      </section>
+    </main>
 
-.faq-list summary {
-  cursor: pointer;
-  font-weight: 700;
-  list-style: none;
-}
+    <footer class="site-footer">
+      <div class="container footer-wrap">
+        <p>© 2026 萬能考場作文：理論與實作</p>
+        <a href="#top">回到頁首</a>
+      </div>
+    </footer>
 
-.faq-list summary::-webkit-details-marker {
-  display: none;
-}
+    <script>
+      document.querySelectorAll('a[href^="#"]').forEach((link) => {
+        link.addEventListener("click", (event) => {
+          const targetId = link.getAttribute("href");
+          if (!targetId || targetId === "#") return;
 
-.faq-list summary::after {
-  content: "+";
-  float: right;
-  color: var(--brand);
-  font-size: 1.25rem;
-  line-height: 1;
-}
+          const target = document.querySelector(targetId);
+          if (!target) return;
 
-.faq-list details[open] summary::after {
-  content: "−";
-}
-
-.faq-list details p {
-  padding-top: 12px;
-}
-
-.contact-section {
-  padding-top: 52px;
-}
-
-.contact-card {
-  grid-template-columns: 1.1fr 0.9fr;
-  align-items: center;
-  padding: 34px;
-  background:
-    linear-gradient(135deg, rgba(28, 75, 130, 0.08), rgba(184, 135, 70, 0.12)),
-    rgba(255, 255, 255, 0.94);
-}
-
-.site-footer {
-  padding: 24px 0 36px;
-}
-
-.footer-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  color: var(--muted);
-  font-size: 0.94rem;
-}
-
-@media (max-width: 960px) {
-  .three-up,
-  .feature-grid,
-  .timeline,
-  .audience-layout,
-  .contact-card {
-    grid-template-columns: 1fr;
-  }
-
-  .nav-wrap,
-  .footer-wrap {
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    padding: 14px 0;
-  }
-
-  .site-nav {
-    gap: 14px;
-  }
-
-  .hero-content {
-    padding-top: 148px;
-  }
-}
-
-@media (max-width: 640px) {
-  .section {
-    padding: 72px 0;
-  }
-
-  .hero {
-    min-height: 92vh;
-    background-position: center center;
-  }
-
-  .hero-description {
-    font-size: 0.98rem;
-  }
-
-  .button {
-    width: 100%;
-  }
-
-  .hero-actions,
-  .contact-actions {
-    flex-direction: column;
-  }
-
-  .info-card,
-  .feature-card,
-  .audience-panel,
-  .timeline-item,
-  .quote-card,
-  .contact-card,
-  .faq-list details {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-}
+          event.preventDefault();
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+    </script>
+  </body>
+</html>
