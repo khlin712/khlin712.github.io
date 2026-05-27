@@ -45,6 +45,17 @@
         }
 
 
+        @keyframes guideGreenBorderPulse {
+            0%, 100% { border-color: #22c55e; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.45), 0 0 10px rgba(34, 197, 94, 0.28); }
+            50% { border-color: #16a34a; box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.10), 0 0 18px rgba(34, 197, 94, 0.55); }
+        }
+        .operation-guide-button {
+            border: 2px solid #22c55e !important;
+            animation: guideGreenBorderPulse 1.35s infinite ease-in-out;
+        }
+        .operation-guide-button:hover {
+            background: #ecfdf5 !important;
+        }
 
         /* 左側欄收合把手：加大可點擊範圍，收合後仍明顯露出 */
         .left-sidebar-toggle-handle {
@@ -88,7 +99,6 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-
         /* 頂部工具列可左右橫向捲動，避免小視窗時按鈕被擠出畫面 */
         .top-toolbar {
             overflow-x: auto;
@@ -115,7 +125,7 @@
             left: -99999px;
             top: 0;
             width: 2200px;
-            height: 1538px; /* v9: 對齊 A4 橫式扣除 4mm 邊界後的可用比例，避免切成第二頁 */
+            height: 1538px;
             background: #fdfbf7;
             color: #1f2937;
             padding: 14px 18px 16px;
@@ -138,9 +148,11 @@
             line-height: 1.1;
         }
         .pdf-export-root .pdf-meta {
-            font-size: 13px;
-            color: #4b5563;
+            font-size: 25px;
+            font-weight: 700;
+            color: #1e3a8a;
             margin: 0;
+            line-height: 1.1;
         }
         .pdf-export-root .pdf-chart-wrap {
             position: relative;
@@ -157,8 +169,6 @@
             overflow: hidden;
             box-sizing: border-box;
         }
-        /* v8：左側改為正式註記欄，家系圖另置於右側圖面區，不再被註記遮蔽。
-           匯出時會依照家系圖實際邊界自動縮放與置中，讓四代圖在 A4 上下方向更充分延展。 */
         .pdf-export-root .pdf-notes {
             position: absolute;
             left: 18px;
@@ -214,33 +224,115 @@
         .pdf-export-root .hide-on-present {
             display: none !important;
         }
-        /* PDF 匯出時不能用 display:none 隱藏圖中的操作按鈕，
-           否則 flex 版面會重排，導致 SVG 家系線對不到人物。
-           改用 visibility:hidden 保留原本佔位，確保圖樣位置正確。 */
         .pdf-export-root .no-print,
         .pdf-export-root .btn-interactive {
             visibility: hidden !important;
             pointer-events: none !important;
         }
 
-        /* v4：PDF 匯出時移除關係／排行標籤的方框，只保留文字。
-           這可避開 html2canvas 對小型 badge 文字垂直置中的渲染誤差。 */
+        /* PDF 匯出：所有「特別標示」保留框線，避免只剩文字而不易辨識 */
         .pdf-export-root [id^="label-"] {
-            background: transparent !important;
-            border-color: transparent !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            border-radius: 0 !important;
+            background: rgba(255,255,255,0.92) !important;
+            border: 1px solid #93c5fd !important;
+            box-shadow: 0 1px 2px rgba(30, 64, 175, 0.12) !important;
+            padding: 2px 6px !important;
+            border-radius: 5px !important;
         }
         .pdf-export-root [id^="label-"] span {
             background: transparent !important;
         }
+        /* PDF 匯出：手足稱謂等小標籤只保留文字，移除框線、底色與陰影 */
         .pdf-export-root .node-container > .absolute[class*="-top-7"] {
             background: transparent !important;
             border-color: transparent !important;
             box-shadow: none !important;
             padding: 0 !important;
             border-radius: 0 !important;
+        }
+
+
+        /* 特別標示：外省背景、收養、出養，在操作版與 PDF 都加上框框 */
+        .waisheng-label,
+        .adoption-label {
+            border-width: 1px !important;
+            border-style: solid !important;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12) !important;
+        }
+        .pdf-export-root .waisheng-label,
+        .pdf-export-root .adoption-label {
+            background: rgba(255,255,255,0.94) !important;
+            border-color: #f59e0b !important;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.10) !important;
+            padding: 4px 6px !important;
+            border-radius: 6px !important;
+        }
+        .pdf-export-root .adoption-label {
+            border-color: #8b5cf6 !important;
+        }
+        .pdf-export-root .waisheng-label .label-badge,
+        .pdf-export-root .adoption-label .label-badge {
+            padding: 0 2px !important;
+            border-radius: 3px !important;
+        }
+        .pdf-export-root .waisheng-label .label-divider {
+            border-bottom-color: rgba(245, 158, 11, 0.35) !important;
+            padding-bottom: 2px !important;
+            margin-bottom: 2px !important;
+        }
+
+        /* 個人註記：每位成員可顯示不超過 20 字的簡短註記 */
+        .person-note-label {
+            max-width: 120px;
+            color: #334155;
+            font-size: 11px;
+            line-height: 1.25;
+            text-align: center;
+            overflow-wrap: anywhere;
+            white-space: normal;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid #94a3b8;
+            border-radius: 6px;
+            padding: 2px 5px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.10);
+        }
+        .pdf-export-root .person-note-label {
+            font-size: 12px;
+            color: #334155;
+            background: rgba(255, 255, 255, 0.96) !important;
+            border: 1px solid #64748b !important;
+            border-radius: 6px !important;
+            padding: 2px 5px !important;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.10) !important;
+        }
+
+
+
+        /* PDF 匯出：關係、手足稱謂、外省背景、收養／出養、個人註記等標示全部移除框線、底色、陰影，只保留文字 */
+        .pdf-export-root [id^="label-"],
+        .pdf-export-root .node-container > .absolute[class*="-top-7"],
+        .pdf-export-root .waisheng-label,
+        .pdf-export-root .adoption-label,
+        .pdf-export-root .person-note-label {
+            background: transparent !important;
+            border: 0 !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
+        }
+        .pdf-export-root [id^="label-"] span,
+        .pdf-export-root .waisheng-label .label-badge,
+        .pdf-export-root .adoption-label .label-badge,
+        .pdf-export-root .waisheng-label .label-divider {
+            background: transparent !important;
+            border: 0 !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin-bottom: 1px !important;
+            border-radius: 0 !important;
+            color: inherit !important;
         }
     </style>
 </head>
@@ -258,16 +350,24 @@
                 <input type="text" id="client-name" class="px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none w-32 bg-gray-50 hover:bg-white transition" placeholder="請輸入姓名" onchange="updateGlobal()">
             </div>
 
-            <div class="flex space-x-1 border border-gray-200 rounded-lg p-1 bg-gray-50 ml-4">
-                <button onclick="undo()" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-white rounded transition" title="復原 (Ctrl+Z)">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
-                </button>
-                <button onclick="redo()" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-white rounded transition" title="重做 (Ctrl+Y)">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"></path></svg>
+            <!-- 復原重做與清空重置 -->
+            <div class="flex items-center space-x-2 ml-4">
+                <div class="flex space-x-1 border border-gray-200 rounded-lg p-1 bg-gray-50">
+                    <button onclick="undo()" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-white rounded transition" title="復原 (Ctrl+Z)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+                    </button>
+                    <button onclick="redo()" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-white rounded transition" title="重做 (Ctrl+Y)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"></path></svg>
+                    </button>
+                </div>
+                <button onclick="clearAll()" class="flex items-center px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition shadow-sm" title="清空所有資料">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    清空重置
                 </button>
             </div>
         </div>
         <div class="flex items-center space-x-2 shrink-0">
+            <button onclick="showOperationGuide()" class="operation-guide-button px-3 py-1.5 text-sm font-bold text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition" title="操作指引">操作指引</button>
             <button onclick="zoomIn()" class="p-2 text-gray-600 hover:bg-gray-100 rounded" title="放大"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg></button>
             <button onclick="zoomOut()" class="p-2 text-gray-600 hover:bg-gray-100 rounded" title="縮小"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path></svg></button>
             <div class="w-px h-6 bg-gray-300 mx-1"></div>
@@ -310,28 +410,16 @@
                         <p class="text-[11px] text-gray-500 mb-1.5 leading-tight">如果排列對你有些幫助，你想得到什麼收穫？</p>
                         <textarea id="global-expectation" class="w-full h-24 p-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="如果排列對你有些幫助，你想得到什麼收穫？" onchange="updateGlobal()"></textarea>
                     </div>
-                    <div class="shrink-0">
+                    <div class="shrink-0 pb-6">
                         <h3 class="text-sm font-bold text-gray-800 flex items-center mb-1">
                             <svg class="w-4 h-4 mr-1 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> 排列師整合釐清
                         </h3>
                         <p class="text-[11px] text-gray-500 mb-1.5 leading-tight">(此欄位為排列師填寫)</p>
                         <textarea id="global-facilitator-notes" class="w-full h-24 p-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="此欄位為排列師填寫" onchange="updateGlobal()"></textarea>
                     </div>
-                    <div class="mt-auto bg-blue-50 p-3 rounded-lg border border-blue-100 text-xs text-blue-800 shrink-0">
-                        <p class="font-bold mb-1">操作提示：</p>
-                        <ul class="list-disc pl-4 space-y-1">
-                            <li><span class="text-amber-600 font-bold">亮金邊</span>的人物代表資料尚未確認或填寫完整。</li>
-                            <li>主角及父母皆可擁有<b>多段伴侶關係</b>，點擊兩側「新增配偶」即可。</li>
-                            <li>同一段關係請點擊關係線中央的文字標籤來修改狀態。</li>
-                        </ul>
-                    </div>
-                    <button onclick="clearAll()" class="mt-2 w-full px-3 py-2 text-sm font-medium text-red-600 border border-red-200 rounded hover:bg-red-50 transition shrink-0">
-                        清空重置
-                    </button>
                 </div>
             </div>
             
-            <!-- 懸浮在右側邊緣的收合/展開把手：加大並向畫布凸出，避免太難按 -->
             <button onclick="toggleLeftSidebar()" class="left-sidebar-toggle-handle absolute top-1/2 -translate-y-1/2 z-50 flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-200" title="收合/展開左側欄" aria-label="收合或展開左側欄">
                 <span class="toggle-grip" aria-hidden="true"><span></span><span></span><span></span></span>
                 <svg id="sidebar-toggle-icon" class="w-6 h-6 ml-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
@@ -350,7 +438,7 @@
                     <div id="label-mg-marriage" class="absolute z-20 cursor-pointer text-xs font-medium text-blue-800 bg-white px-2 py-0.5 rounded border border-blue-300 shadow-sm hover:ring-2 ring-blue-400 transition text-center max-w-[140px] break-words whitespace-pre-wrap leading-tight" onclick="openDrawer('marriage', 'maternal')"></div>
                     <div id="label-parents-marriage" class="absolute z-20 cursor-pointer text-sm font-bold text-indigo-900 bg-indigo-50 px-3 py-1 rounded border border-indigo-300 shadow hover:ring-2 ring-indigo-400 transition text-center max-w-[160px] break-words whitespace-pre-wrap leading-tight" onclick="openDrawer('marriage', 'client')"></div>
                     
-                    <!-- Dynamic Marriage Labels (For multiple spouses across generations) -->
+                    <!-- Dynamic Marriage Labels -->
                     <div id="dynamic-labels-container"></div>
 
                     <!-- L1: Grandparents -->
@@ -365,27 +453,22 @@
                         </div>
                     </div>
 
-                    <!-- L1.5: Parents generation (Includes Parents' extra spouses) -->
+                    <!-- L1.5: Parents generation -->
                     <div class="flex justify-between w-full relative z-10">
                         <div class="flex justify-center items-start gap-4 w-1/2" id="paternal-children-container"></div>
                         <div class="flex justify-center items-start gap-4 w-1/2" id="maternal-children-container"></div>
                     </div>
 
-                    <!-- L2: Client Generation (Client + Siblings + Spouses + Parents' Extra Children) -->
+                    <!-- L2: Client Generation -->
                     <div class="flex flex-col items-center mt-32 z-10 w-full relative">
                         <div class="flex justify-center items-start w-full">
-                            <!-- Father's extra marriages children (Half-siblings on paternal side) -->
                             <div class="flex justify-end items-start gap-8 pr-12" id="father-extra-children-container"></div>
-                            
-                            <!-- Client and full siblings and client's spouses -->
                             <div class="flex justify-center items-start gap-8" id="client-children-container"></div>
-                            
-                            <!-- Mother's extra marriages children (Half-siblings on maternal side) -->
                             <div class="flex justify-start items-start gap-8 pl-12" id="mother-extra-children-container"></div>
                         </div>
                     </div>
 
-                    <!-- L3: Client's Children Generation (Multiple families side-by-side) -->
+                    <!-- L3: Client's Children Generation -->
                     <div class="flex flex-col items-center mt-32 z-10 w-full relative">
                         <div class="flex items-start justify-center gap-12" id="client-family-children-container"></div>
                     </div>
@@ -408,12 +491,11 @@
                 
                 <div id="form-siblings" class="hidden flex-col h-full">
                     <div class="bg-blue-50 text-blue-800 p-3 rounded-lg text-xs leading-relaxed border border-blue-100 mb-4 shrink-0">
-                        請依長幼順序設定，由上至下對應圖表中的<b>由左至右</b>。最多可設定 10 位。<br>
+                        請依長幼順序設定，由上至下對應圖表中的<b>由左至右</b>。最多可設定 20 位。<br>
                         <span class="text-red-600 font-bold mt-1 inline-block">* 記得必須選擇一位「主角」喔！</span><br>
                         <span class="text-purple-700 font-bold mt-1 inline-block">* 在系統排列中，流產、墮胎或早夭的手足必須排入「正確的」長幼順序中，不可遺漏。</span>
                     </div>
                     <div id="sibling-slots-container" class="space-y-2 pb-10 overflow-y-auto flex-1 no-scrollbar">
-                        <!-- Javascript 注入 10 個 select -->
                     </div>
                 </div>
 
@@ -434,6 +516,7 @@
                         <div class="flex space-x-6">
                             <label class="flex items-center cursor-pointer"><input type="radio" name="edit-status" value="alive" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300" onchange="toggleNodeFields()"> <span class="ml-2 text-sm">存活</span></label>
                             <label class="flex items-center cursor-pointer"><input type="radio" name="edit-status" value="dead" class="w-4 h-4 text-red-600 focus:ring-red-500 border-gray-300" onchange="toggleNodeFields()"> <span class="ml-2 text-sm text-red-600 font-medium">已歿</span></label>
+                            <label class="flex items-center cursor-pointer"><input type="radio" name="edit-status" value="unknown" class="w-4 h-4 text-gray-600 focus:ring-gray-500 border-gray-300" onchange="toggleNodeFields()"> <span class="ml-2 text-sm text-gray-600 font-medium">未知</span></label>
                         </div>
                     </div>
 
@@ -442,12 +525,17 @@
                         <input type="number" id="edit-age" class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="例如: 25">
                     </div>
 
+                    <div id="field-person-note">
+                        <label for="edit-person-note" class="block text-sm font-medium text-gray-700 mb-1">個人註記 <span class="text-xs text-gray-500">（不超過20字）</span></label>
+                        <input type="text" id="edit-person-note" maxlength="20" class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="例如：早夭、失聯、長期照顧者" oninput="updatePersonNoteCounter(); validateDrawerForm();">
+                        <div id="person-note-counter" class="text-[11px] text-gray-400 text-right mt-1">0/20</div>
+                    </div>
+
                     <div id="field-dead-reason" class="hidden">
                         <label id="label-dead-reason" class="block text-sm font-medium text-red-700 mb-1">離世/流產 原因</label>
                         <textarea id="edit-dead-reason" class="w-full p-2.5 text-sm border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition resize-none h-20" placeholder="例如: 車禍, 生病..." oninput="validateDrawerForm()"></textarea>
                     </div>
 
-                    <!-- 收出養區塊 -->
                     <div id="field-adoption" class="bg-indigo-50 p-3 rounded-lg border border-indigo-100 mt-4 transition-all">
                         <label class="block text-sm font-medium text-indigo-900 mb-1">血緣與收出養狀態</label>
                         <select id="edit-adoption" class="w-full p-2 text-sm border border-indigo-200 rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition bg-white" onchange="toggleNodeFields()">
@@ -515,7 +603,6 @@
 
     </div>
 
-    <!-- 專屬提示視窗 -->
     <div id="custom-modal" class="fixed inset-0 bg-black/40 z-[100] hidden flex-col items-center justify-center transition-opacity opacity-0 backdrop-blur-sm no-print">
         <div id="custom-modal-content" class="bg-white rounded-xl shadow-2xl w-80 p-6 transform scale-95 transition-transform duration-200 flex flex-col">
             <h3 id="custom-modal-title" class="text-lg font-bold text-gray-900 mb-2">提示</h3>
@@ -533,24 +620,24 @@
 
         const defaultState = {
             paternal: {
-                husband: { id: 'pg_h', type: 'male', status: 'alive', age: '', isGP: true, isWaishengren: false, waishengrenReason: '', isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '' },
-                wife: { id: 'pg_w', type: 'female', status: 'alive', age: '', isGP: true, isWaishengren: false, waishengrenReason: '', isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '' },
+                husband: { id: 'pg_h', type: 'male', status: 'alive', age: '', isGP: true, isWaishengren: false, waishengrenReason: '', isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '', personNote: '' },
+                wife: { id: 'pg_w', type: 'female', status: 'alive', age: '', isGP: true, isWaishengren: false, waishengrenReason: '', isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '', personNote: '' },
                 marriage: { status: '存續', divorceAge: '', relation: '祖父母', isConfirmed: false },
-                children: [{ id: 'father', type: 'male', status: 'alive', age: '', isMain: true, role: 'father', relationOption: 'main', isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '' }]
+                children: [{ id: 'father', type: 'male', status: 'alive', age: '', isMain: true, role: 'father', relationOption: 'main', isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '', personNote: '', isWaishengren: false, waishengrenReason: '' }]
             },
             maternal: {
-                husband: { id: 'mg_h', type: 'male', status: 'alive', age: '', isGP: true, isWaishengren: false, waishengrenReason: '', isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '' },
-                wife: { id: 'mg_w', type: 'female', status: 'alive', age: '', isGP: true, isWaishengren: false, waishengrenReason: '', isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '' },
+                husband: { id: 'mg_h', type: 'male', status: 'alive', age: '', isGP: true, isWaishengren: false, waishengrenReason: '', isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '', personNote: '' },
+                wife: { id: 'mg_w', type: 'female', status: 'alive', age: '', isGP: true, isWaishengren: false, waishengrenReason: '', isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '', personNote: '' },
                 marriage: { status: '存續', divorceAge: '', relation: '外祖父母', isConfirmed: false },
-                children: [{ id: 'mother', type: 'female', status: 'alive', age: '', isMain: true, role: 'mother', relationOption: 'main', isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '' }]
+                children: [{ id: 'mother', type: 'female', status: 'alive', age: '', isMain: true, role: 'mother', relationOption: 'main', isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '', personNote: '', isWaishengren: false, waishengrenReason: '' }]
             },
             client: {
                 marriage: { status: '存續', divorceAge: '', relation: '父母', isConfirmed: false },
-                children: [{ id: 'client_node', type: 'star', status: 'alive', age: '', isMain: true, role: 'client', relationOption: 'main', isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '' }]
+                children: [{ id: 'client_node', type: 'star', status: 'alive', age: '', isMain: true, role: 'client', relationOption: 'main', isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '', personNote: '' }]
             },
             clientFamilies: [], 
-            fatherFamilies: [], // 父親的其他婚姻 (往左延伸)
-            motherFamilies: [], // 母親的其他婚姻 (往右延伸)
+            fatherFamilies: [], 
+            motherFamilies: [], 
             global: { majorEvents: '', hiddenPeople: '', otherNotes: '', expectation: '', facilitatorNotes: '', clientName: '' } 
         };
 
@@ -566,7 +653,6 @@
                 if(parsedData.global.expectation === undefined) parsedData.global.expectation = '';
                 if(parsedData.global.facilitatorNotes === undefined) parsedData.global.facilitatorNotes = '';
                 
-                // 相容舊版本的單一配偶資料結構
                 if (parsedData.clientFamily && !parsedData.clientFamilies) {
                     parsedData.clientFamilies = [];
                     if (parsedData.clientFamily.spouse) {
@@ -588,6 +674,44 @@
                 if(!parsedData.clientFamilies) parsedData.clientFamilies = [];
                 if(!parsedData.fatherFamilies) parsedData.fatherFamilies = [];
                 if(!parsedData.motherFamilies) parsedData.motherFamilies = [];
+
+                // 舊版草稿相容：爸爸、媽媽原本沒有外省背景欄位，補上欄位避免編輯時資料未定義。
+                if (parsedData.paternal?.children) {
+                    const fatherNode = parsedData.paternal.children.find(c => c.role === 'father' || c.id === 'father');
+                    if (fatherNode) {
+                        if (fatherNode.isWaishengren === undefined) fatherNode.isWaishengren = false;
+                        if (fatherNode.waishengrenReason === undefined) fatherNode.waishengrenReason = '';
+                    }
+                }
+                if (parsedData.maternal?.children) {
+                    const motherNode = parsedData.maternal.children.find(c => c.role === 'mother' || c.id === 'mother');
+                    if (motherNode) {
+                        if (motherNode.isWaishengren === undefined) motherNode.isWaishengren = false;
+                        if (motherNode.waishengrenReason === undefined) motherNode.waishengrenReason = '';
+                    }
+                }
+
+                // 舊版草稿相容：為所有既有成員補上個人註記欄位。
+                const ensurePersonNoteFields = (node) => {
+                    if (!node) return;
+                    if (node.personNote === undefined) node.personNote = '';
+                    node.personNote = String(node.personNote || '').slice(0, 20);
+                };
+                const normalizeNodeStatus = (node) => {
+                    if (!node) return;
+                    if (!['alive', 'dead', 'unknown'].includes(node.status)) node.status = 'alive';
+                };
+                ensurePersonNoteFields(parsedData.paternal?.husband); normalizeNodeStatus(parsedData.paternal?.husband);
+                ensurePersonNoteFields(parsedData.paternal?.wife); normalizeNodeStatus(parsedData.paternal?.wife);
+                ensurePersonNoteFields(parsedData.maternal?.husband); normalizeNodeStatus(parsedData.maternal?.husband);
+                ensurePersonNoteFields(parsedData.maternal?.wife); normalizeNodeStatus(parsedData.maternal?.wife);
+                parsedData.paternal?.children?.forEach(node => { ensurePersonNoteFields(node); normalizeNodeStatus(node); });
+                parsedData.maternal?.children?.forEach(node => { ensurePersonNoteFields(node); normalizeNodeStatus(node); });
+                parsedData.client?.children?.forEach(node => { ensurePersonNoteFields(node); normalizeNodeStatus(node); });
+                parsedData.clientFamilies?.forEach(f => { ensurePersonNoteFields(f.spouse); normalizeNodeStatus(f.spouse); f.children?.forEach(node => { ensurePersonNoteFields(node); normalizeNodeStatus(node); }); });
+                parsedData.fatherFamilies?.forEach(f => { ensurePersonNoteFields(f.spouse); normalizeNodeStatus(f.spouse); f.children?.forEach(node => { ensurePersonNoteFields(node); normalizeNodeStatus(node); }); });
+                parsedData.motherFamilies?.forEach(f => { ensurePersonNoteFields(f.spouse); normalizeNodeStatus(f.spouse); f.children?.forEach(node => { ensurePersonNoteFields(node); normalizeNodeStatus(node); }); });
+
                 state = parsedData;
             } catch (e) {
                 console.error("讀取草稿失敗，使用預設值", e);
@@ -676,6 +800,28 @@
                     customModal.classList.remove('opacity-0');
                     customModalContent.classList.remove('scale-95');
                 });
+            });
+        }
+
+
+        function showOperationGuide() {
+            showModal({
+                title: '操作指引',
+                message: `
+                    <div class="text-left space-y-3 leading-relaxed">
+                        <p class="font-bold text-blue-900">請先依序完成以下 5 件事：</p>
+                        <ol class="list-decimal pl-5 space-y-2">
+                            <li><b>先填當事人姓名</b>，方便匯出 PDF 與 JSON 時辨識檔案。</li>
+                            <li><b>點圖上的人或關係線文字</b>，逐一填寫年齡、生存狀態、離世原因、收出養、外省背景或簡短註記。</li>
+                            <li><b>手足與子女請照長幼順序</b>排列；流產、墮胎、早夭也要放入正確位置。</li>
+                            <li><b>左側欄填整體資訊</b>：重大事件、被排除或遺忘的人、期待收穫與其他補充。</li>
+                            <li><b>完成後先下載 JSON 備份</b>，再匯出 PDF，避免資料遺失。</li>
+                        </ol>
+                        <p class="text-xs text-gray-500 border-t pt-3">畫布操作：拖曳空白處可移動畫面；滑鼠滾輪或上方按鈕可放大縮小。</p>
+                    </div>
+                `,
+                type: 'alert',
+                confirmText: '我知道了'
             });
         }
 
@@ -837,42 +983,58 @@
                 const hasNoAge = node.age === '' || node.age === null || node.age === undefined;
                 const hasNoReason = !node.deathReason || String(node.deathReason).trim() === '';
                 return hasNoAge || hasNoReason; 
+            } else if (node.status === 'unknown') {
+                return false;
             } else {
                 return !node.isConfirmed; 
             }
         }
 
         function renderShape(node, incomplete) {
-            const size = 50;
-            const strokeColor = "#1e3a8a"; 
-            const glowClass = incomplete ? "glow-gold" : ""; 
+            // PDF 修正重點：所有圖形都必須完整落在 SVG viewBox 內。
+            // 原本把方形/圓形/三角形放大到 viewBox 外（負座標或超過 50），
+            // html2canvas 匯出 PDF 時容易把外溢部分裁切，造成圓形、方形、三角形變形。
+            const size = 64;
+            const c = 32;
+            const strokeColor = "#1e3a8a";
+            const glowClass = incomplete ? "glow-gold" : "";
             
-            let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" class="overflow-visible relative z-0 ${glowClass}">`;
+            let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" class="relative z-0 ${glowClass}" style="overflow: visible;">`;
             
             if (node.type === 'male') {
-                svg += `<rect x="6" y="6" width="38" height="38" fill="white" stroke="${strokeColor}" stroke-width="2.5" rx="2"/>`;
+                svg += `<rect x="6" y="6" width="52" height="52" fill="white" stroke="${strokeColor}" stroke-width="2.8" rx="3.5"/>`;
             } else if (node.type === 'female') {
-                svg += `<circle cx="25" cy="25" r="19" fill="white" stroke="${strokeColor}" stroke-width="2.5"/>`;
+                svg += `<circle cx="${c}" cy="${c}" r="26" fill="white" stroke="${strokeColor}" stroke-width="2.8"/>`;
             } else if (node.type === 'abortion') {
-                svg += `<polygon points="25,6 6,44 44,44" fill="white" stroke="${strokeColor}" stroke-width="2.5" stroke-linejoin="round"/>`;
+                svg += `<polygon points="32,7 7,57 57,57" fill="white" stroke="${strokeColor}" stroke-width="2.8" stroke-linejoin="round"/>`;
             } else if (node.type === 'star') {
-                svg += `<polygon points="25,4 31,18 46,18 34,27 38,42 25,33 12,42 16,27 4,18 19,18" fill="white" stroke="${strokeColor}" stroke-width="2.5" stroke-linejoin="round"/>`;
+                svg += `<polygon points="32,7 39,24 57,24 42.5,35 48,56 32,43 16,56 21.5,35 7,24 25,24" fill="white" stroke="${strokeColor}" stroke-width="2.8" stroke-linejoin="round"/>`;
             }
 
             if (node.status === 'dead' || node.type === 'abortion') {
                 svg += `
-                    <line x1="2" y1="2" x2="48" y2="48" stroke="#b91c1c" stroke-width="2.5" stroke-linecap="round"/>
-                    <line x1="48" y1="2" x2="2" y2="48" stroke="#b91c1c" stroke-width="2.5" stroke-linecap="round"/>
+                    <line x1="8" y1="8" x2="56" y2="56" stroke="#b91c1c" stroke-width="2.8" stroke-linecap="round"/>
+                    <line x1="56" y1="8" x2="8" y2="56" stroke="#b91c1c" stroke-width="2.8" stroke-linecap="round"/>
                 `;
             }
 
-            if (node.role === 'father') svg += `<text x="25" y="31" text-anchor="middle" fill="${strokeColor}" font-size="16" font-weight="bold">父</text>`;
-            else if (node.role === 'mother') svg += `<text x="25" y="31" text-anchor="middle" fill="${strokeColor}" font-size="16" font-weight="bold">母</text>`;
-            else if (node.role === 'client') svg += `<text x="25" y="31" text-anchor="middle" fill="${strokeColor}" font-size="16" font-weight="bold">我</text>`;
-            else if (node.role === 'spouse') svg += `<text x="25" y="31" text-anchor="middle" fill="${strokeColor}" font-size="16" font-weight="bold">配</text>`;
+            if (node.status === 'unknown') svg += `<text x="${c}" y="41" text-anchor="middle" fill="#475569" font-size="28" font-weight="bold">?</text>`;
+            else if (node.role === 'father') svg += `<text x="${c}" y="38" text-anchor="middle" fill="${strokeColor}" font-size="18" font-weight="bold">父</text>`;
+            else if (node.role === 'mother') svg += `<text x="${c}" y="38" text-anchor="middle" fill="${strokeColor}" font-size="18" font-weight="bold">母</text>`;
+            else if (node.role === 'client') svg += `<text x="${c}" y="38" text-anchor="middle" fill="${strokeColor}" font-size="18" font-weight="bold">我</text>`;
+            else if (node.role === 'spouse') svg += `<text x="${c}" y="38" text-anchor="middle" fill="${strokeColor}" font-size="18" font-weight="bold">配</text>`;
 
             svg += `</svg>`;
             return svg;
+        }
+
+        function escapeHTML(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
         function renderNodeHTML(node, group, familyId = null, customClass = '') {
@@ -882,35 +1044,42 @@
 
             if (node.type === 'abortion' || node.status === 'dead') {
                 textClass = "text-red-700 font-bold";
-                if (node.age) infoText += `(${node.age}歲)`;
-                if (node.deathReason) infoText += `<div class="text-[10px] text-red-600 font-normal mt-1 leading-snug break-words w-full whitespace-pre-wrap">${node.deathReason}</div>`;
+                if (node.age) infoText += `(${escapeHTML(node.age)}歲)`;
+                if (node.deathReason) infoText += `<div class="text-xs text-red-700 font-medium mt-1 leading-tight break-words w-full whitespace-pre-wrap">${escapeHTML(node.deathReason)}</div>`;
+            } else if (node.status === 'unknown') {
+                textClass = "text-gray-600 font-bold";
+                infoText = `未知`;
             } else {
-                infoText = node.age ? `${node.age}歲` : ``;
+                infoText = node.age ? `${escapeHTML(node.age)}歲` : ``;
             }
 
+            const personNote = String(node.personNote || '').slice(0, 20);
+            const personNoteHtml = personNote
+                ? `<div class="person-note-label mt-1">${escapeHTML(personNote)}</div>`
+                : '';
+
             let gpText = "";
-            if (node.isGP && node.isWaishengren) {
+            if (node.isWaishengren) {
                 let reasonHtml = node.waishengrenReason ? `<div class="text-gray-700 mt-1 font-normal leading-snug whitespace-pre-wrap">${node.waishengrenReason}</div>` : "";
                 let positionClass = node.type === 'male' ? "right-full mr-2.5" : "left-full ml-2.5";
                 
-                gpText = `<div class="absolute ${positionClass} top-0 bg-amber-50 text-amber-900 px-2.5 py-1.5 rounded-md shadow border border-amber-300 text-left z-20 w-max max-w-[140px] break-words text-[11px] pointer-events-none">
-                            <div class="font-bold text-amber-700 ${node.waishengrenReason ? 'border-b border-amber-200 pb-1 mb-1' : ''}">外省背景</div>
+                gpText = `<div class="waisheng-label absolute ${positionClass} top-0 bg-amber-50 text-amber-900 px-2.5 py-1.5 rounded-md shadow border border-amber-300 text-left z-20 w-max max-w-[140px] break-words text-[11px] pointer-events-none">
+                            <div class="label-badge label-divider font-bold text-amber-700 ${node.waishengrenReason ? 'border-b border-amber-200 pb-1 mb-1' : ''}">外省背景</div>
                             ${reasonHtml}
                           </div>`;
             }
 
-            // 新增：收出養標籤顯示
             let adoptionLabel = "";
             if (node.adoptionStatus === 'adopted_in') {
                 let noteHtml = node.otherSystemNotes ? `<div class="text-[9px] font-normal mt-0.5 leading-tight text-emerald-800">${node.otherSystemNotes}</div>` : "";
-                adoptionLabel = `<div class="absolute -top-10 -right-6 bg-emerald-50 text-emerald-900 px-1.5 py-1 rounded shadow-sm border border-emerald-300 text-left z-30 w-max max-w-[120px] break-words pointer-events-none">
-                                    <span class="bg-emerald-600 text-white text-[10px] font-bold px-1 py-0.5 rounded-sm mr-0.5">收養</span>
+                adoptionLabel = `<div class="adoption-label absolute -top-10 -right-6 bg-emerald-50 text-emerald-900 px-1.5 py-1 rounded shadow-sm border border-emerald-300 text-left z-30 w-max max-w-[120px] break-words pointer-events-none">
+                                    <span class="label-badge bg-emerald-600 text-white text-[10px] font-bold px-1 py-0.5 rounded-sm mr-0.5">收養</span>
                                     ${noteHtml}
                                  </div>`;
             } else if (node.adoptionStatus === 'given_away') {
                 let noteHtml = node.otherSystemNotes ? `<div class="text-[9px] font-normal mt-0.5 leading-tight text-purple-800">${node.otherSystemNotes}</div>` : "";
-                adoptionLabel = `<div class="absolute -top-10 -right-6 bg-purple-50 text-purple-900 px-1.5 py-1 rounded shadow-sm border border-purple-300 text-left z-30 w-max max-w-[120px] break-words pointer-events-none">
-                                    <span class="bg-purple-600 text-white text-[10px] font-bold px-1 py-0.5 rounded-sm mr-0.5">出養</span>
+                adoptionLabel = `<div class="adoption-label absolute -top-10 -right-6 bg-purple-50 text-purple-900 px-1.5 py-1 rounded shadow-sm border border-purple-300 text-left z-30 w-max max-w-[120px] break-words pointer-events-none">
+                                    <span class="label-badge bg-purple-600 text-white text-[10px] font-bold px-1 py-0.5 rounded-sm mr-0.5">出養</span>
                                     ${noteHtml}
                                  </div>`;
             }
@@ -943,6 +1112,7 @@
                     <div class="text-xs font-medium mt-2 text-center leading-tight w-[90px] ${textClass}">
                         ${infoText}
                     </div>
+                    ${personNoteHtml}
                 </div>
             `;
         }
@@ -958,7 +1128,7 @@
                 else if (group === 'fatherFamilies') index = state.fatherFamilies.findIndex(f => f.id === familyId);
                 else if (group === 'motherFamilies') index = state.motherFamilies.findIndex(f => f.id === familyId);
                 
-                const numMap = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+                const numMap = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十'];
                 const numStr = numMap[index] || (index + 1);
                 labelText = `關係${numStr} - 孩子順序`;
             }
@@ -992,17 +1162,15 @@
             document.getElementById('wrap-mg_h').innerHTML = renderNodeHTML(state.maternal.husband, 'maternal');
             document.getElementById('wrap-mg_w').innerHTML = renderNodeHTML(state.maternal.wife, 'maternal');
 
-            // Render Paternal Line (Include Father's Spouses)
             const pChildren = state.paternal.children;
             document.getElementById('paternal-children-container').innerHTML = 
                 renderManageButton('paternal', 'left') + pChildren.map(c => {
                     if (c.role === 'father') {
                         let extraHtml = `<div class="mt-36 flex flex-col items-center no-print relative mr-4">
                             <div class="absolute -top-7 text-[10px] font-bold text-gray-500 bg-white px-1.5 py-0.5 rounded border border-gray-200 shadow-sm whitespace-nowrap z-10 pointer-events-none">前/後配偶</div>
-                            <button onclick="addParentSpouse('father')" class="btn-interactive flex items-center justify-center w-[50px] h-[50px] rounded-full border-2 border-dashed border-indigo-400 text-indigo-600 hover:text-white hover:bg-indigo-500 hover:border-indigo-500 transition shadow-sm bg-indigo-50" title="新增配偶"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
+                            <button onclick="addParentSpouse('father')" class="btn-interactive flex items-center justify-center w-[64px] h-[64px] rounded-full border-2 border-dashed border-indigo-400 text-indigo-600 hover:text-white hover:bg-indigo-500 hover:border-indigo-500 transition shadow-sm bg-indigo-50" title="新增配偶"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
                             <div class="text-[11px] font-bold mt-2 text-center text-indigo-600 w-[90px]">新增配偶</div>
                         </div>`;
-                        // 父親的其他配偶反向排列，使其向左延伸展開
                         [...state.fatherFamilies].reverse().forEach(fam => {
                             extraHtml += renderNodeHTML(fam.spouse, 'fatherFamilies', fam.id);
                         });
@@ -1011,19 +1179,17 @@
                     return renderNodeHTML(c, 'paternal');
                 }).join('');
 
-            // Render Maternal Line (Include Mother's Spouses)
             const mChildren = state.maternal.children;
             document.getElementById('maternal-children-container').innerHTML = 
                 mChildren.map(c => {
                     if (c.role === 'mother') {
                         let html = renderNodeHTML(c, 'maternal');
-                        // 母親的其他配偶正向排列，向右延伸展開
                         state.motherFamilies.forEach(fam => {
                             html += renderNodeHTML(fam.spouse, 'motherFamilies', fam.id);
                         });
                         html += `<div class="mt-36 flex flex-col items-center no-print relative ml-4">
                             <div class="absolute -top-7 text-[10px] font-bold text-gray-500 bg-white px-1.5 py-0.5 rounded border border-gray-200 shadow-sm whitespace-nowrap z-10 pointer-events-none">前/後配偶</div>
-                            <button onclick="addParentSpouse('mother')" class="btn-interactive flex items-center justify-center w-[50px] h-[50px] rounded-full border-2 border-dashed border-indigo-400 text-indigo-600 hover:text-white hover:bg-indigo-500 hover:border-indigo-500 transition shadow-sm bg-indigo-50" title="新增配偶"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
+                            <button onclick="addParentSpouse('mother')" class="btn-interactive flex items-center justify-center w-[64px] h-[64px] rounded-full border-2 border-dashed border-indigo-400 text-indigo-600 hover:text-white hover:bg-indigo-500 hover:border-indigo-500 transition shadow-sm bg-indigo-50" title="新增配偶"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
                             <div class="text-[11px] font-bold mt-2 text-center text-indigo-600 w-[90px]">新增配偶</div>
                         </div>`;
                         return html;
@@ -1031,7 +1197,6 @@
                     return renderNodeHTML(c, 'maternal');
                 }).join('') + renderManageButton('maternal', 'right');
 
-            // Render Client + Siblings + All Spouses + Sibling Manage Button
             let clientHtml = '';
             const cChildren = state.client.children;
             cChildren.forEach(c => {
@@ -1042,7 +1207,7 @@
                     });
                     clientHtml += `<div class="mt-36 flex flex-col items-center no-print relative ml-4">
                         <div class="absolute -top-7 text-[10px] font-bold text-gray-500 bg-white px-1.5 py-0.5 rounded border border-gray-200 shadow-sm whitespace-nowrap z-10 pointer-events-none">配偶</div>
-                        <button onclick="addSpouse()" class="btn-interactive flex items-center justify-center w-[50px] h-[50px] rounded-full border-2 border-dashed border-emerald-400 text-emerald-600 hover:text-white hover:bg-emerald-500 hover:border-emerald-500 transition shadow-sm bg-emerald-50" title="新增配偶"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
+                        <button onclick="addSpouse()" class="btn-interactive flex items-center justify-center w-[64px] h-[64px] rounded-full border-2 border-dashed border-emerald-400 text-emerald-600 hover:text-white hover:bg-emerald-500 hover:border-emerald-500 transition shadow-sm bg-emerald-50" title="新增配偶"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
                         <div class="text-[11px] font-bold mt-2 text-center text-emerald-600 w-[90px]">新增配偶</div>
                     </div>`;
                 }
@@ -1050,7 +1215,6 @@
             clientHtml += renderManageButton('client');
             document.getElementById('client-children-container').innerHTML = clientHtml;
 
-            // Render Children for Father's Extra Families (Left Side)
             let fatherExtraHtml = '';
             [...state.fatherFamilies].reverse().forEach((fam, idx) => {
                 fatherExtraHtml += `<div class="flex justify-center items-start gap-4">`;
@@ -1060,7 +1224,6 @@
             });
             document.getElementById('father-extra-children-container').innerHTML = fatherExtraHtml;
 
-            // Render Children for Mother's Extra Families (Right Side)
             let motherExtraHtml = '';
             state.motherFamilies.forEach((fam, idx) => {
                 motherExtraHtml += `<div class="flex justify-center items-start gap-4">`;
@@ -1070,7 +1233,6 @@
             });
             document.getElementById('mother-extra-children-container').innerHTML = motherExtraHtml;
 
-            // Render Children for Client's Extra Families
             let cfChildrenHtml = '';
             state.clientFamilies.forEach((fam, idx) => {
                 cfChildrenHtml += `<div class="flex justify-center items-start gap-4">`;
@@ -1080,12 +1242,10 @@
             });
             document.getElementById('client-family-children-container').innerHTML = cfChildrenHtml;
 
-            // Render Dynamic Marriage Labels for Multiple Families
             let dynamicLabelsHtml = '';
             
-            // Client's multiple marriages labels
             state.clientFamilies.forEach((fam, idx) => {
-                const numMap = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+                const numMap = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十'];
                 const numStr = numMap[idx] || (idx + 1);
                 let relation = `關係${numStr}`;
                 
@@ -1097,7 +1257,6 @@
                 dynamicLabelsHtml += `<div id="label-client-marriage-${fam.id}" class="absolute z-20 cursor-pointer text-[11px] font-medium text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-300 shadow-sm hover:ring-2 ring-emerald-400 transition text-center max-w-[140px] break-words whitespace-pre-wrap leading-tight ${glowClass}" onclick="openDrawer('marriage', 'clientFamilies', null, null, '${fam.id}')">${relation}</div>`;
             });
 
-            // Father's multiple marriages labels
             state.fatherFamilies.forEach((fam, idx) => {
                 let relation = fam.marriage.relation || '父親其他關係';
                 if (fam.marriage.status === '無') {
@@ -1107,7 +1266,6 @@
                 dynamicLabelsHtml += `<div id="label-father-marriage-${fam.id}" class="absolute z-20 cursor-pointer text-[11px] font-medium text-indigo-800 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-300 shadow-sm hover:ring-2 ring-indigo-400 transition text-center max-w-[140px] break-words whitespace-pre-wrap leading-tight ${glowClass}" onclick="openDrawer('marriage', 'fatherFamilies', null, null, '${fam.id}')">${relation}</div>`;
             });
 
-            // Mother's multiple marriages labels
             state.motherFamilies.forEach((fam, idx) => {
                 let relation = fam.marriage.relation || '母親其他關係';
                 if (fam.marriage.status === '無') {
@@ -1119,7 +1277,6 @@
 
             document.getElementById('dynamic-labels-container').innerHTML = dynamicLabelsHtml;
 
-            // Render Static Labels
             const getMLabel = (m, group) => {
                 let relation = m.relation;
                 if (!relation) {
@@ -1150,6 +1307,134 @@
             setTimeout(drawSVGLines, 20); 
         }
 
+        function redrawSVGLinesInDrawArea(drawArea) {
+            const svg = drawArea ? drawArea.querySelector('#svg-lines') : null;
+            if (!svg || !drawArea) return;
+
+            const cssEscape = (value) => {
+                if (window.CSS && typeof window.CSS.escape === 'function') return window.CSS.escape(value);
+                return String(value).replace(/([ #;?%&,.+*~':"!^$[\]()=>|/@])/g, '\\$1');
+            };
+
+            let paths = '';
+
+            // 讓 SVG 畫布比 draw-area 更寬，避免右側成員較多時，最右側線段被 SVG 自身寬度裁切。
+            svg.setAttribute('viewBox', '0 0 3200 2600');
+            svg.setAttribute('preserveAspectRatio', 'none');
+            svg.style.width = '3200px';
+            svg.style.height = '2600px';
+            svg.style.overflow = 'visible';
+
+            const getLocalCenter = (elId) => {
+                const el = drawArea.querySelector('#' + cssEscape(elId));
+                if (!el) return null;
+
+                const elRect = el.getBoundingClientRect();
+                const areaRect = drawArea.getBoundingClientRect();
+
+                return {
+                    x: elRect.left - areaRect.left + (elRect.width / 2),
+                    y: elRect.top - areaRect.top + 32,
+                    top: elRect.top - areaRect.top + 6
+                };
+            };
+
+            const drawFamilyLines = (n1Id, n2Id, childrenList, labelId, mStatus, dropExtraLength = 0) => {
+                const n1 = getLocalCenter('node-' + n1Id);
+                const n2 = getLocalCenter('node-' + n2Id);
+                if (!n1 || !n2) return;
+
+                const strokeProps = mStatus === '存續'
+                    ? `stroke="#1e3a8a" stroke-width="3" stroke-linecap="round" shape-rendering="geometricPrecision"`
+                    : `stroke="#ef4444" stroke-width="3" stroke-dasharray="6,4" stroke-linecap="round" shape-rendering="geometricPrecision"`;
+                const childStrokeProps = `stroke="#1e3a8a" stroke-width="2.5" stroke-linecap="round" shape-rendering="geometricPrecision"`;
+                const flatY = (n1.y + n2.y) / 2;
+
+                paths += `<line x1="${n1.x}" y1="${flatY}" x2="${n2.x}" y2="${flatY}" ${strokeProps} />`;
+
+                const midX = (n1.x + n2.x) / 2;
+                const midY = flatY; 
+
+                const labelEl = drawArea.querySelector('#' + cssEscape(labelId));
+                if (labelEl) {
+                    labelEl.style.left = `${midX}px`;
+                    labelEl.style.top = `${midY - 12}px`;
+                    labelEl.style.transform = 'translate(-50%, -100%)';
+                }
+
+                let targets = (childrenList || []).map(c => {
+                    let center = getLocalCenter('node-' + c.id);
+                    if (center) center.node = c;
+                    return center;
+                }).filter(Boolean);
+
+                if (targets.length === 0) return;
+
+                const minChildTop = Math.min(...targets.map(t => t.top));
+                const dropY = minChildTop - 35 - dropExtraLength; 
+
+                paths += `<line x1="${midX}" y1="${midY}" x2="${midX}" y2="${dropY}" ${childStrokeProps} />`;
+
+                const firstX = Math.min(...targets.map(t => t.x), midX);
+                const lastX = Math.max(...targets.map(t => t.x), midX);
+
+                // 先畫每個孩子的垂直線，再畫橫向手足線，避免在高解析 PDF 中交會處看起來像斷掉。
+                targets.forEach(t => {
+                    let strokeStyle = childStrokeProps;
+                    if (t.node.adoptionStatus === 'adopted_in') {
+                        strokeStyle = `stroke="#1e3a8a" stroke-width="2.5" stroke-dasharray="5,4" stroke-linecap="round" shape-rendering="geometricPrecision"`;
+                    } else if (t.node.adoptionStatus === 'given_away') {
+                        strokeStyle = `stroke="#9ca3af" stroke-width="2.5" stroke-linecap="round" shape-rendering="geometricPrecision"`;
+                    }
+
+                    paths += `<line x1="${t.x}" y1="${dropY}" x2="${t.x}" y2="${t.top}" ${strokeStyle} />`;
+
+                    if (t.node.adoptionStatus === 'given_away') {
+                        const midVertY = (dropY + t.top) / 2;
+                        paths += `<line x1="${t.x - 7}" y1="${midVertY}" x2="${t.x + 7}" y2="${midVertY}" stroke="#9ca3af" stroke-width="2.5" stroke-linecap="round" shape-rendering="geometricPrecision" />`;
+                    }
+                });
+
+                paths += `<line x1="${firstX}" y1="${dropY}" x2="${lastX}" y2="${dropY}" ${childStrokeProps} />`;
+            };
+
+            drawFamilyLines('pg_h', 'pg_w', state.paternal.children, 'label-pg-marriage', state.paternal.marriage.status);
+            drawFamilyLines('mg_h', 'mg_w', state.maternal.children, 'label-mg-marriage', state.maternal.marriage.status);
+
+            const fatherNode = state.paternal.children.find(c => c.role === 'father');
+            const motherNode = state.maternal.children.find(c => c.role === 'mother');
+            if (fatherNode && motherNode) {
+                drawFamilyLines(fatherNode.id, motherNode.id, state.client.children, 'label-parents-marriage', state.client.marriage.status, 20);
+            }
+
+            const clientNode = state.client.children.find(c => c.role === 'client');
+            if (clientNode && state.clientFamilies.length > 0) {
+                let previousNodeId = clientNode.id;
+                state.clientFamilies.forEach((fam) => {
+                    drawFamilyLines(previousNodeId, fam.spouse.id, fam.children, `label-client-marriage-${fam.id}`, fam.marriage.status, 20);
+                    previousNodeId = fam.spouse.id; 
+                });
+            }
+
+            if (fatherNode && state.fatherFamilies.length > 0) {
+                let previousNodeId = fatherNode.id;
+                state.fatherFamilies.forEach((fam) => {
+                    drawFamilyLines(previousNodeId, fam.spouse.id, fam.children, `label-father-marriage-${fam.id}`, fam.marriage.status, 20);
+                    previousNodeId = fam.spouse.id; 
+                });
+            }
+
+            if (motherNode && state.motherFamilies.length > 0) {
+                let previousNodeId = motherNode.id;
+                state.motherFamilies.forEach((fam) => {
+                    drawFamilyLines(previousNodeId, fam.spouse.id, fam.children, `label-mother-marriage-${fam.id}`, fam.marriage.status, 20);
+                    previousNodeId = fam.spouse.id; 
+                });
+            }
+
+            svg.innerHTML = paths;
+        }
+
         function drawSVGLines() {
             const svg = document.getElementById('svg-lines');
             const drawArea = document.getElementById('draw-area');
@@ -1161,7 +1446,6 @@
                 if (!el) return null;
 
                 let x = 0, y = 0, current = el;
-                // 往上遞迴累加偏移量，完全不受 transform scale 干擾
                 while (current && current !== drawArea && current !== document.body) {
                     x += current.offsetLeft;
                     y += current.offsetTop;
@@ -1174,7 +1458,6 @@
                 };
             };
 
-            // 改為傳入 children 節點資料，以取得收出養狀態
             const drawFamilyLines = (n1Id, n2Id, childrenList, labelId, mStatus, dropExtraLength = 0) => {
                 const n1 = getLocalCenter('node-' + n1Id);
                 const n2 = getLocalCenter('node-' + n2Id);
@@ -1213,7 +1496,6 @@
                 paths += `<line x1="${firstX}" y1="${dropY}" x2="${lastX}" y2="${dropY}" stroke="#1e3a8a" stroke-width="2.5" />`;
 
                 targets.forEach(t => {
-                    // 根據收出養狀態調整垂直線
                     let strokeStyle = `stroke="#1e3a8a" stroke-width="2.5"`;
                     if (t.node.adoptionStatus === 'adopted_in') {
                         strokeStyle = `stroke="#1e3a8a" stroke-width="2.5" stroke-dasharray="5,4"`;
@@ -1223,7 +1505,6 @@
                     
                     paths += `<line x1="${t.x}" y1="${dropY}" x2="${t.x}" y2="${t.top}" ${strokeStyle} />`;
 
-                    // 出養給他家的橫切短線
                     if (t.node.adoptionStatus === 'given_away') {
                         const midVertY = (dropY + t.top) / 2;
                         paths += `<line x1="${t.x - 7}" y1="${midVertY}" x2="${t.x + 7}" y2="${midVertY}" stroke="#9ca3af" stroke-width="2.5" stroke-linecap="round" />`;
@@ -1231,7 +1512,6 @@
                 });
             };
 
-            // 原有長輩及案主主婚姻
             drawFamilyLines('pg_h', 'pg_w', state.paternal.children, 'label-pg-marriage', state.paternal.marriage.status);
             drawFamilyLines('mg_h', 'mg_w', state.maternal.children, 'label-mg-marriage', state.maternal.marriage.status);
 
@@ -1241,7 +1521,6 @@
                 drawFamilyLines(fatherNode.id, motherNode.id, state.client.children, 'label-parents-marriage', state.client.marriage.status, 20);
             }
 
-            // Draw Multiple Marriages for Client (Connecting previous node to next spouse sequentially)
             const clientNode = state.client.children.find(c => c.role === 'client');
             if (clientNode && state.clientFamilies.length > 0) {
                 let previousNodeId = clientNode.id;
@@ -1251,7 +1530,6 @@
                 });
             }
 
-            // Draw Multiple Marriages for Father (Connecting previous node to next spouse sequentially towards left)
             if (fatherNode && state.fatherFamilies.length > 0) {
                 let previousNodeId = fatherNode.id;
                 state.fatherFamilies.forEach((fam) => {
@@ -1260,7 +1538,6 @@
                 });
             }
 
-            // Draw Multiple Marriages for Mother (Connecting previous node to next spouse sequentially towards right)
             if (motherNode && state.motherFamilies.length > 0) {
                 let previousNodeId = motherNode.id;
                 state.motherFamilies.forEach((fam) => {
@@ -1292,16 +1569,16 @@
             if (currentEditMode === 'node') {
                 const status = document.querySelector('input[name="edit-status"]:checked')?.value || 'alive';
                 const type = document.getElementById('edit-type').value;
+                const isUnknown = status === 'unknown';
                 let isAlive = status === 'alive';
                 
-                if (currentEditNodeData && currentEditNodeData.role === 'client') {
-                    isAlive = true;
-                }
                 if (type === 'abortion' || type === 'miscarriage') {
                     isAlive = false;
                 }
 
-                if (isAlive) {
+                if (isUnknown) {
+                    saveBtn.disabled = false;
+                } else if (isAlive) {
                     const isConfirmed = document.getElementById('edit-confirm-correct').checked;
                     saveBtn.disabled = !isConfirmed;
                 } else {
@@ -1352,11 +1629,11 @@
                 if (group === 'clientFamilies') index = state.clientFamilies.findIndex(f => f.id === familyId);
                 else if (group === 'fatherFamilies') index = state.fatherFamilies.findIndex(f => f.id === familyId);
                 else if (group === 'motherFamilies') index = state.motherFamilies.findIndex(f => f.id === familyId);
-                const numMap = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+                const numMap = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十'];
                 const numStr = numMap[index] || (index + 1);
                 drawerLabel = `關係${numStr} - 孩子順序`;
             }
-            drawerTitle.innerText = `${drawerLabel} (最多10位)`;
+            drawerTitle.innerText = `${drawerLabel} (最多20位)`;
 
             const container = document.getElementById('sibling-slots-container');
             container.innerHTML = '';
@@ -1379,7 +1656,7 @@
                 optionsHTML = `<option value="">(無)</option><option value="older_brother">哥哥</option><option value="older_sister">姊姊</option><option value="main">${mainLabel}</option><option value="younger_brother">弟弟</option><option value="younger_sister">妹妹</option><option value="abortion">墮胎流產</option>`;
             }
 
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 20; i++) {
                 container.innerHTML += `
                     <div class="flex items-center space-x-3 bg-white p-2.5 rounded-lg border border-gray-200 shadow-sm">
                         <span class="text-xs font-bold text-gray-600 w-12 shrink-0 text-center">第 ${i+1} 位</span>
@@ -1390,7 +1667,7 @@
                 `;
             }
             
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 20; i++) {
                 let child = currentChildren[i] || null;
                 let val = '';
                 if (child) {
@@ -1481,12 +1758,14 @@
             if (!node) return;
 
             document.getElementById('edit-type').value = node.type;
+            if (!['alive', 'dead', 'unknown'].includes(node.status)) node.status = 'alive';
             document.querySelectorAll('input[name="edit-status"]').forEach(el => el.checked = (el.value === node.status));
             document.getElementById('edit-age').value = node.age || '';
+            document.getElementById('edit-person-note').value = String(node.personNote || '').slice(0, 20);
+            updatePersonNoteCounter();
             document.getElementById('edit-dead-reason').value = node.deathReason || '';
             document.getElementById('edit-confirm-correct').checked = !!node.isConfirmed;
 
-            // 載入收出養屬性
             document.getElementById('edit-adoption').value = node.adoptionStatus || 'none';
             document.getElementById('edit-adoption-notes').value = node.otherSystemNotes || '';
 
@@ -1505,14 +1784,10 @@
                 optAbortion.hidden = false;
             }
 
-            if (node.role === 'client') {
-                fieldStatus.style.display = 'none';
-            } else {
-                fieldStatus.style.display = 'block';
-            }
+            fieldStatus.style.display = 'block';
 
             const gpField = document.getElementById('field-waishengren');
-            if (node.isGP) {
+            if (node.isGP || ['father', 'mother'].includes(node.role)) {
                 gpField.classList.remove('hidden');
                 document.getElementById('edit-is-waisheng').checked = !!node.isWaishengren;
                 document.getElementById('edit-waisheng-reason').value = node.waishengrenReason || '';
@@ -1555,12 +1830,19 @@
             toggleNodeFields();
         }
 
+        function updatePersonNoteCounter() {
+            const input = document.getElementById('edit-person-note');
+            const counter = document.getElementById('person-note-counter');
+            if (!input || !counter) return;
+            if (input.value.length > 20) input.value = input.value.slice(0, 20);
+            counter.innerText = `${input.value.length}/20`;
+            counter.classList.toggle('text-red-500', input.value.length >= 20);
+        }
+
         function toggleNodeFields() {
             const type = document.getElementById('edit-type').value;
             let status = document.querySelector('input[name="edit-status"]:checked')?.value || 'alive';
             
-            if (currentEditNodeData && currentEditNodeData.role === 'client') status = 'alive';
-
             const fieldAge = document.getElementById('field-age');
             const deadField = document.getElementById('field-dead-reason');
             const ageLabel = document.getElementById('label-edit-age');
@@ -1577,7 +1859,7 @@
                 deadField.classList.remove('hidden'); 
                 if(deadLabel) deadLabel.innerHTML = '流產/墮胎 原因 <span class="text-red-700 font-bold">(必填)</span>';
                 fieldConfirm.classList.add('hidden');
-                fieldAdoption.classList.add('hidden'); // 流產不需設定收出養
+                fieldAdoption.classList.add('hidden'); 
             } else {
                 document.querySelectorAll('input[name="edit-status"]').forEach(el => el.disabled = false);
                 fieldAge.classList.remove('hidden');
@@ -1586,16 +1868,21 @@
                 if (status === 'dead') {
                     deadField.classList.remove('hidden');
                     if(deadLabel) deadLabel.innerHTML = '離世 原因';
+                    fieldAge.classList.remove('hidden');
                     ageLabel.innerHTML = '<span class="text-red-700 font-bold">離世年齡</span> (供圖面顯示)';
+                    fieldConfirm.classList.add('hidden');
+                } else if (status === 'unknown') {
+                    deadField.classList.add('hidden');
+                    fieldAge.classList.add('hidden');
                     fieldConfirm.classList.add('hidden');
                 } else {
                     deadField.classList.add('hidden');
+                    fieldAge.classList.remove('hidden');
                     ageLabel.innerHTML = '目前年齡 (供圖面顯示)';
                     fieldConfirm.classList.remove('hidden');
                 }
             }
 
-            // 處理收出養欄位顯示
             const adoptionStatus = document.getElementById('edit-adoption').value;
             const adoptionNotesField = document.getElementById('field-adoption-notes');
             if (adoptionStatus === 'adopted_in' || adoptionStatus === 'given_away') {
@@ -1668,7 +1955,7 @@
                 else if (currentEditGroup === 'motherFamilies') targetArray = state.motherFamilies.find(f => f.id === currentEditFamilyId).children;
                 else targetArray = state[currentEditGroup].children;
                 
-                for (let i = 0; i < 10; i++) {
+                for (let i = 0; i < 20; i++) {
                     const val = document.getElementById(`sibling-slot-${i}`).value;
                     if (val === '') continue; 
                     if (val === 'main') mainCount++;
@@ -1679,7 +1966,7 @@
                     if (val === 'main') {
                         matchedChild = targetArray.find(c => c.isMain || ['father', 'mother', 'client'].includes(c.role));
                         if (!matchedChild) {
-                            matchedChild = { id: getNewId(), status: 'alive', age: '', deathReason: '', isMain: true, role: currentEditGroup === 'paternal' ? 'father' : (currentEditGroup === 'maternal' ? 'mother' : 'client'), isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '' };
+                            matchedChild = { id: getNewId(), status: 'alive', age: '', deathReason: '', isMain: true, role: currentEditGroup === 'paternal' ? 'father' : (currentEditGroup === 'maternal' ? 'mother' : 'client'), isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '', personNote: '', isWaishengren: false, waishengrenReason: '' };
                             if (currentEditGroup === 'paternal') matchedChild.type = 'male';
                             if (currentEditGroup === 'maternal') matchedChild.type = 'female';
                             if (currentEditGroup === 'client') matchedChild.type = 'star';
@@ -1689,7 +1976,7 @@
                     } else {
                         matchedChild = targetArray.find(c => (c.relationOption === val || (val==='abortion' && c.type==='abortion')) && !newChildren.includes(c));
                         if (!matchedChild) {
-                            matchedChild = { id: getNewId(), status: val === 'abortion' ? 'dead' : 'alive', age: '', deathReason: '', isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '' };
+                            matchedChild = { id: getNewId(), status: val === 'abortion' ? 'dead' : 'alive', age: '', deathReason: '', personNote: '', isConfirmed: false, adoptionStatus: 'none', otherSystemNotes: '', personNote: '' };
                         }
                     }
                     
@@ -1722,21 +2009,21 @@
                     }
 
                     node.age = document.getElementById('edit-age').value;
+                    node.personNote = String(document.getElementById('edit-person-note').value || '').slice(0, 20);
                     node.isConfirmed = document.getElementById('edit-confirm-correct').checked;
                     
-                    // 儲存收出養狀態
                     node.adoptionStatus = document.getElementById('edit-adoption').value;
                     node.otherSystemNotes = document.getElementById('edit-adoption-notes').value;
 
-                    if (node.role === 'client') {
-                        node.status = 'alive';
+                    node.status = document.querySelector('input[name="edit-status"]:checked')?.value || 'alive';
+                    node.deathReason = (node.status === 'dead' || node.type === 'abortion' || node.type === 'miscarriage') ? document.getElementById('edit-dead-reason').value : '';
+                    if (node.status === 'unknown') {
+                        node.age = '';
+                        node.isConfirmed = false;
                         node.deathReason = '';
-                    } else {
-                        node.status = document.querySelector('input[name="edit-status"]:checked').value;
-                        node.deathReason = (node.status === 'dead' || node.type === 'abortion' || node.type === 'miscarriage') ? document.getElementById('edit-dead-reason').value : '';
                     }
 
-                    if (node.isGP) {
+                    if (node.isGP || ['father', 'mother'].includes(node.role)) {
                         node.isWaishengren = document.getElementById('edit-is-waisheng').checked;
                         node.waishengrenReason = document.getElementById('edit-waisheng-reason').value;
                     }
@@ -1744,15 +2031,15 @@
                     if (node.isTempSpouse) {
                         delete node.isTempSpouse;
                         if (currentEditGroup === 'clientFamilies') {
-                            const numMap = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+                            const numMap = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十'];
                             const numStr = numMap[state.clientFamilies.length] || (state.clientFamilies.length + 1);
                             state.clientFamilies.push({ id: currentEditFamilyId, spouse: node, marriage: { status: '存續', divorceReason: '', relation: `關係${numStr}`, isConfirmed: false }, children: [] });
                         } else if (currentEditGroup === 'fatherFamilies') {
-                            const numMap = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+                            const numMap = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十'];
                             const numStr = numMap[state.fatherFamilies.length] || (state.fatherFamilies.length + 1);
                             state.fatherFamilies.push({ id: currentEditFamilyId, spouse: node, marriage: { status: '存續', divorceAge: '', relation: `其他關係${numStr}`, isConfirmed: false }, children: [] });
                         } else if (currentEditGroup === 'motherFamilies') {
-                            const numMap = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+                            const numMap = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十'];
                             const numStr = numMap[state.motherFamilies.length] || (state.motherFamilies.length + 1);
                             state.motherFamilies.push({ id: currentEditFamilyId, spouse: node, marriage: { status: '存續', divorceAge: '', relation: `其他關係${numStr}`, isConfirmed: false }, children: [] });
                         }
@@ -1782,7 +2069,7 @@
         function addSpouse() {
             const newFamId = 'cf_' + getNewId();
             const tempSpouse = { 
-                id: 'client_spouse_' + getNewId(), type: 'star', status: 'alive', age: '', 
+                id: 'client_spouse_' + getNewId(), type: 'star', status: 'alive', age: '', personNote: '', 
                 isMain: true, role: 'spouse', isConfirmed: false, isTempSpouse: true, adoptionStatus: 'none', otherSystemNotes: '' 
             };
             openDrawer('node', 'clientFamilies', null, tempSpouse, newFamId);
@@ -1792,7 +2079,7 @@
             const isFather = target === 'father';
             const newFamId = (isFather ? 'ff_' : 'mf_') + getNewId();
             const tempSpouse = { 
-                id: target + '_spouse_' + getNewId(), type: isFather ? 'female' : 'male', status: 'alive', age: '', 
+                id: target + '_spouse_' + getNewId(), type: isFather ? 'female' : 'male', status: 'alive', age: '', personNote: '', 
                 isMain: true, role: 'spouse', isConfirmed: false, isTempSpouse: true, adoptionStatus: 'none', otherSystemNotes: '' 
             };
             openDrawer('node', isFather ? 'fatherFamilies' : 'motherFamilies', null, tempSpouse, newFamId);
@@ -1899,11 +2186,7 @@
             return new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         }
 
-
         function normalizePDFLabelPositions(exportRoot) {
-            // html2canvas 對 Tailwind 的 translate(-50%, -100%) / -translate-x-1/2
-            // 偶爾會有細微偏移。匯出前把這些「靠 transform 置中」的標籤
-            // 轉成明確 px 座標，避免 PDF 裡文字框沒有壓在格線中央。
             const marriageLabels = exportRoot.querySelectorAll('[id^="label-"]');
             marriageLabels.forEach(label => {
                 const left = parseFloat(label.style.left);
@@ -1955,7 +2238,6 @@
 
             if (!Number.isFinite(minX) || !Number.isFinite(minY) || maxX <= minX || maxY <= minY) return;
 
-            // 把 SVG 線條納入邊界，避免橫向婚姻線或親子線被裁掉。
             const svg = drawArea.querySelector('#svg-lines');
             if (svg) {
                 const lines = Array.from(svg.querySelectorAll('line, path, polyline'));
@@ -2043,6 +2325,9 @@
                 document.body.appendChild(exportRoot);
 
                 await waitForNextPaint();
+                // PDF 使用複製後的 draw-area 重新計算線段，避免沿用螢幕版座標造成右側線段斷裂或偏移。
+                redrawSVGLinesInDrawArea(clonedDrawArea);
+                await waitForNextPaint();
                 normalizePDFLabelPositions(exportRoot);
                 await waitForNextPaint();
                 fitPDFChartToStage(exportRoot);
@@ -2050,7 +2335,7 @@
 
                 const canvas = await html2canvas(exportRoot, {
                     backgroundColor: '#fdfbf7',
-                    scale: 1.5,
+                    scale: 3,
                     useCORS: true,
                     allowTaint: true,
                     windowWidth: exportRoot.scrollWidth,
@@ -2067,10 +2352,7 @@
                 const usableWidth = pageWidth - margin * 2;
                 const usableHeight = pageHeight - margin * 2;
 
-                // v9：強制單頁輸出。
-                // 不再依高度切片新增頁面，而是將整張匯出畫布等比例縮放到 A4 橫式可用範圍內。
-                // 這可確保無論文字欄內容與家系圖高度如何，PDF 都只會產生 1 頁。
-                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                const imgData = canvas.toDataURL('image/png');
                 const imgRatio = canvas.width / canvas.height;
                 const pageRatio = usableWidth / usableHeight;
 
@@ -2087,7 +2369,7 @@
                     offsetX = margin + (usableWidth - imgWidth) / 2;
                 }
 
-                pdf.addImage(imgData, 'JPEG', offsetX, offsetY, imgWidth, imgHeight);
+                pdf.addImage(imgData, 'PNG', offsetX, offsetY, imgWidth, imgHeight, undefined, 'FAST');
                 pdf.save(`${getDynamicFileName()}.pdf`);
             } catch (error) {
                 console.error('PDF 匯出失敗：', error);
@@ -2114,7 +2396,6 @@
                         if (loaded.maternal.marriage && !loaded.maternal.marriage.relation) loaded.maternal.marriage.relation = '外祖父母';
                         if (loaded.client.marriage && !loaded.client.marriage.relation) loaded.client.marriage.relation = '父母';
                         
-                        // 相容舊版本的匯入格式
                         if (loaded.clientFamily && !loaded.clientFamilies) {
                             loaded.clientFamilies = [];
                             if (loaded.clientFamily.spouse) {
@@ -2154,7 +2435,10 @@
             reader.readAsText(file);
         }
 
-        window.onload = renderDOM;
+        window.onload = function() {
+            renderDOM();
+            setTimeout(showOperationGuide, 300);
+        };
 
     </script>
 </body>
