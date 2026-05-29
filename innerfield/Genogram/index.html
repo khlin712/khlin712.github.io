@@ -367,7 +367,8 @@
             </div>
         </div>
         <div class="flex items-center space-x-2 shrink-0">
-            <button onclick="showOperationGuide()" class="operation-guide-button px-3 py-1.5 text-sm font-bold text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition" title="操作指引">操作指引</button>
+            <button onclick="showUsageNotice()" class="px-3 py-1.5 text-sm font-extrabold text-amber-700 bg-amber-50 border-2 border-amber-300 rounded-lg hover:bg-amber-100 transition shadow-sm" title="使用聲明" aria-label="使用聲明">！</button>
+            <button onclick="showOperationGuide()" class="operation-guide-button px-3 py-1.5 text-sm font-bold text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition" title="操作說明">操作說明</button>
             <button onclick="zoomIn()" class="p-2 text-gray-600 hover:bg-gray-100 rounded" title="放大"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg></button>
             <button onclick="zoomOut()" class="p-2 text-gray-600 hover:bg-gray-100 rounded" title="縮小"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path></svg></button>
             <div class="w-px h-6 bg-gray-300 mx-1"></div>
@@ -604,7 +605,7 @@
     </div>
 
     <div id="custom-modal" class="fixed inset-0 bg-black/40 z-[100] hidden flex-col items-center justify-center transition-opacity opacity-0 backdrop-blur-sm no-print">
-        <div id="custom-modal-content" class="bg-white rounded-xl shadow-2xl w-80 p-6 transform scale-95 transition-transform duration-200 flex flex-col">
+        <div id="custom-modal-content" class="bg-white rounded-xl shadow-2xl w-[min(92vw,720px)] max-h-[88vh] p-6 transform scale-95 transition-transform duration-200 flex flex-col">
             <h3 id="custom-modal-title" class="text-lg font-bold text-gray-900 mb-2">提示</h3>
             <p id="custom-modal-message" class="text-sm text-gray-600 mb-6 leading-relaxed">訊息內容</p>
             <div class="flex justify-end space-x-3 mt-auto">
@@ -776,6 +777,7 @@
             customModalTitle.innerText = title;
             customModalMessage.innerHTML = message; 
             
+            customModalConfirm.disabled = false;
             customModalConfirm.className = `px-4 py-2 text-sm font-medium text-white rounded-lg transition ` + 
                 (confirmColor === 'red' ? 'bg-red-600 hover:bg-red-700 shadow-sm shadow-red-200' : 'bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-200');
             customModalConfirm.innerText = confirmText;
@@ -803,6 +805,123 @@
             });
         }
 
+
+        const usageNoticeHTML = `
+            <div class="text-left space-y-4 leading-relaxed max-h-[65vh] overflow-y-auto pr-1">
+                <p>本網站、檔案、圖像、文字、操作流程、介面設計、說明內容及相關資訊，除另有標示外，均為著作人依法享有著作權之著作。</p>
+                <p>依《著作權法》第22條第1項、第26條之1第1項規定，著作人專有重製其著作及公開傳輸其著作之權利；另依同法第37條規定，著作財產權人得授權他人利用著作，授權利用之地域、時間、內容、利用方法或其他事項，依當事人約定。</p>
+                <p>實務上雖有「權利耗盡原則」，然本網站及相關檔案、資訊之使用，係基於著作人授權，而非所有權移轉或著作財產權讓與。使用者僅得於授權範圍內使用，不因取得連結、檔案、帳號、操作權限或下載副本，即取得重製、散布、公開傳輸、改作、轉售、再授權、拆解程式或其他商業利用之權利。</p>
+                <p class="font-bold text-gray-900">本工具與內容之使用，應取得合法授權。</p>
+                <label class="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 cursor-pointer select-none">
+                    <input id="usage-notice-check" type="checkbox" class="mt-1 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="text-sm font-bold text-amber-950">我已取得合法授權，尊重著作人之智慧成果，遵循平衡法則，與道同行。</span>
+                </label>
+                <label class="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3 cursor-pointer select-none">
+                    <input id="usage-license-info-check" type="checkbox" class="mt-1 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="text-sm font-bold text-blue-950">我未取得合法授權，我要取得合法授權。</span>
+                </label>
+            </div>
+        `;
+
+        const authorizationInfoHTML = `
+            <div class="text-left space-y-4 leading-relaxed max-h-[65vh] overflow-y-auto pr-1">
+                <h4 class="text-base font-bold text-gray-900">授權版本與使用範圍</h4>
+
+                <section class="space-y-2">
+                    <h5 class="font-bold text-blue-900">一、個人版：新台幣 1,800 元</h5>
+                    <p>個人版僅授權使用者本人使用，適用於個人學習、自我練習、個案紀錄，以及使用者本人進行之一對一或工作坊形式之家族系統排列工作。</p>
+                    <p>個人版授權使用者得於排列工作過程中操作本工具，協助個案呈現家族系統、關係序位與相關資訊。惟本授權僅限於「排列工作本身」之輔助使用，不包含將本工具作為課程教材、教學示範、操作教學、工具講解、培訓內容或商業產品之一部。</p>
+                    <p>未經另行書面授權，個人版使用者不得向第三人講解本工具之設計邏輯、操作流程、介面功能、製作方法或使用方法；亦不得錄影教學、截圖說明、提供他人練習、複製、下載、轉傳、改作、拆解程式、轉售或轉授權。</p>
+                </section>
+
+                <hr class="border-gray-200">
+
+                <section class="space-y-2">
+                    <h5 class="font-bold text-blue-900">二、公開教學版：新台幣 18,000 元</h5>
+                    <p>公開教學版授權講師本人於課程、工作坊、公開教學、教學示範、個案工作或小型團體帶領中使用本工具。</p>
+                    <p>公開教學版得於課程、工作坊或公開教學情境中，示範本工具之操作方式，並說明其於家族系統排列工作中的輔助用途。惟本授權僅限授權講師本人使用，不包含學員、學生、助教、共同講師或其他第三人自行操作或使用本工具之權利。</p>
+                    <p>若學員、學生、助教或其他參與者欲自行操作、練習或日後使用本工具，應另行向著作人購買「個人版」授權。不得因參與課程、觀看示範、取得講義或接觸教學內容，即視為取得本工具之使用權。</p>
+                    <p>公開教學版授權人得協助推廣或代售「個人版」授權。凡經由該授權人介紹並完成購買之個人版授權，著作人得按實際成交金額之 20% 作為推廣分潤。分潤計算、付款方式、結算期間及成交認定方式，依雙方另行約定或實際交易紀錄為準。</p>
+                    <p>本授權不包含程式碼、網站、檔案、介面設計、操作流程、製作方法或相關資料之轉售、轉授權、再製、改作、公開散布、拆解程式，或作為其他商業產品之一部之權利。</p>
+                </section>
+
+                <hr class="border-gray-200">
+
+                <section class="space-y-2">
+                    <h5 class="font-bold text-gray-900">共同限制</h5>
+                    <p>無論購買個人版或公開教學版，使用者均不得有下列行為：</p>
+                    <ol class="list-decimal pl-5 space-y-1">
+                        <li>擅自複製、轉傳、公開分享、上傳至其他平台或提供第三人使用。</li>
+                        <li>擅自將本網站、程式碼、檔案、介面設計、操作流程或相關資料改作、販售、出租、轉授權或作為其他商業產品之一部。</li>
+                        <li>以截圖、錄影、拆解程式、擷取原始碼、仿製介面或其他方式，規避授權限制或製作相同、近似之工具。</li>
+                        <li>將本工具提供予未取得授權者自行操作、下載、保存、修改或散布。</li>
+                        <li>以任何方式侵害著作人之著作權、授權利益或商業權益。</li>
+                    </ol>
+                    <p>使用者違反本聲明或逾越授權範圍者，著作人得終止授權，並依法主張相關權利。</p>
+                </section>
+
+                <hr class="border-gray-200">
+
+                <section class="space-y-2">
+                    <h5 class="font-bold text-gray-900">聯繫方式</h5>
+                    <p>如需購買授權、公開教學合作、機構使用、多人授權或其他商業合作，請聯繫：</p>
+                    <p class="font-bold text-blue-700 break-all">khlin712@gmail.com</p>
+                </section>
+            </div>
+        `;
+
+        function showAuthorizationInfo() {
+            showModal({
+                title: '授權版本與使用範圍',
+                message: authorizationInfoHTML,
+                type: 'alert',
+                confirmText: '我知道了'
+            });
+        }
+
+        function showUsageNotice(showGuideAfterClose = false) {
+            showModal({
+                title: '使用聲明',
+                message: usageNoticeHTML,
+                type: 'alert',
+                confirmText: '開始使用',
+                onConfirm: () => {
+                    if (showGuideAfterClose) {
+                        setTimeout(showOperationGuide, 260);
+                    }
+                }
+            });
+
+            requestAnimationFrame(() => {
+                const checkbox = document.getElementById('usage-notice-check');
+                const licenseInfoCheckbox = document.getElementById('usage-license-info-check');
+                customModalConfirm.disabled = true;
+                customModalConfirm.classList.add('opacity-50', 'cursor-not-allowed');
+                customModalConfirm.classList.remove('hover:bg-blue-700');
+
+                if (checkbox) {
+                    checkbox.addEventListener('change', () => {
+                        if (licenseInfoCheckbox && checkbox.checked) licenseInfoCheckbox.checked = false;
+                        customModalConfirm.disabled = !checkbox.checked;
+                        customModalConfirm.classList.toggle('opacity-50', !checkbox.checked);
+                        customModalConfirm.classList.toggle('cursor-not-allowed', !checkbox.checked);
+                        customModalConfirm.classList.toggle('hover:bg-blue-700', checkbox.checked);
+                    });
+                }
+
+                if (licenseInfoCheckbox) {
+                    licenseInfoCheckbox.addEventListener('change', () => {
+                        if (!licenseInfoCheckbox.checked) return;
+                        if (checkbox) checkbox.checked = false;
+                        customModalConfirm.disabled = true;
+                        customModalConfirm.classList.add('opacity-50', 'cursor-not-allowed');
+                        customModalConfirm.classList.remove('hover:bg-blue-700');
+                        closeModal();
+                        setTimeout(showAuthorizationInfo, 260);
+                    });
+                }
+            });
+        }
 
         function showOperationGuide() {
             showModal({
@@ -2437,7 +2556,7 @@
 
         window.onload = function() {
             renderDOM();
-            setTimeout(showOperationGuide, 300);
+            setTimeout(() => showUsageNotice(true), 300);
         };
 
     </script>
