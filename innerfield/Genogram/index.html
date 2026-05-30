@@ -334,6 +334,17 @@
             border-radius: 0 !important;
             color: inherit !important;
         }
+
+
+        /* PDF 匯出：保留 glow-gold 金色閃爍提示效果。
+           只確保 SVG 外溢可見，不移除 glow-gold、不停用 animation/filter。 */
+        .pdf-export-root .node-container svg,
+        .pdf-export-root svg.glow-gold {
+            overflow: visible !important;
+        }
+        .pdf-export-root .glow-gold {
+            animation: goldGlow 2s infinite ease-in-out !important;
+        }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col text-gray-800 relative">
@@ -825,10 +836,8 @@
 
         const authorizationInfoHTML = `
             <div class="text-left space-y-4 leading-relaxed max-h-[65vh] overflow-y-auto pr-1">
-                <h4 class="text-base font-bold text-gray-900">授權版本與使用範圍</h4>
-
                 <section class="space-y-2">
-                    <h5 class="font-bold text-blue-900">一、個人版：新台幣 1,800 元</h5>
+                    <h5 class="font-bold text-blue-900">一、個人版：新台幣 XXX 元</h5>
                     <p>個人版僅授權使用者本人使用，適用於個人學習、自我練習、個案紀錄，以及使用者本人進行之一對一或工作坊形式之家族系統排列工作。</p>
                     <p>個人版授權使用者得於排列工作過程中操作本工具，協助個案呈現家族系統、關係序位與相關資訊。惟本授權僅限於「排列工作本身」之輔助使用，不包含將本工具作為課程教材、教學示範、操作教學、工具講解、培訓內容或商業產品之一部。</p>
                     <p>未經另行書面授權，個人版使用者不得向第三人講解本工具之設計邏輯、操作流程、介面功能、製作方法或使用方法；亦不得錄影教學、截圖說明、提供他人練習、複製、下載、轉傳、改作、拆解程式、轉售或轉授權。</p>
@@ -837,11 +846,11 @@
                 <hr class="border-gray-200">
 
                 <section class="space-y-2">
-                    <h5 class="font-bold text-blue-900">二、公開教學版：新台幣 18,000 元</h5>
+                    <h5 class="font-bold text-blue-900">二、公開教學版：新台幣 XXX 元</h5>
                     <p>公開教學版授權講師本人於課程、工作坊、公開教學、教學示範、個案工作或小型團體帶領中使用本工具。</p>
                     <p>公開教學版得於課程、工作坊或公開教學情境中，示範本工具之操作方式，並說明其於家族系統排列工作中的輔助用途。惟本授權僅限授權講師本人使用，不包含學員、學生、助教、共同講師或其他第三人自行操作或使用本工具之權利。</p>
                     <p>若學員、學生、助教或其他參與者欲自行操作、練習或日後使用本工具，應另行向著作人購買「個人版」授權。不得因參與課程、觀看示範、取得講義或接觸教學內容，即視為取得本工具之使用權。</p>
-                    <p>公開教學版授權人得協助推廣或代售「個人版」授權。凡經由該授權人介紹並完成購買之個人版授權，著作人得按實際成交金額之 20% 作為推廣分潤。分潤計算、付款方式、結算期間及成交認定方式，依雙方另行約定或實際交易紀錄為準。</p>
+                    <p>公開教學版授權人得協助推廣或代售「個人版」授權。凡經由該授權人介紹並完成購買之個人版授權，著作人得按實際成交金額之 OO % 作為推廣分潤。分潤計算、付款方式、結算期間及成交認定方式，依雙方另行約定或實際交易紀錄為準。</p>
                     <p>本授權不包含程式碼、網站、檔案、介面設計、操作流程、製作方法或相關資料之轉售、轉授權、再製、改作、公開散布、拆解程式，或作為其他商業產品之一部之權利。</p>
                 </section>
 
@@ -865,7 +874,7 @@
                 <section class="space-y-2">
                     <h5 class="font-bold text-gray-900">聯繫方式</h5>
                     <p>如需購買授權、公開教學合作、機構使用、多人授權或其他商業合作，請聯繫：</p>
-                    <p class="font-bold text-blue-700 break-all">khlin712@gmail.com</p>
+                    <p><a class="font-bold text-blue-700 break-all underline hover:text-blue-900" href="mailto:khlin712@gmail.com?subject=%E5%AE%B6%E6%97%8F%E7%B3%BB%E7%B5%B1%E5%9C%96%E5%B7%A5%E5%85%B7%E8%B3%BC%E8%B2%B7%E6%8E%88%E6%AC%8A">khlin712@gmail.com</a></p>
                 </section>
             </div>
         `;
@@ -874,8 +883,21 @@
             showModal({
                 title: '授權版本與使用範圍',
                 message: authorizationInfoHTML,
-                type: 'alert',
-                confirmText: '我知道了'
+                type: 'confirm',
+                confirmText: '聯絡購買授權'
+            });
+
+            requestAnimationFrame(() => {
+                customModalCancel.innerText = '返回使用聲明';
+                customModalCancel.onclick = () => {
+                    closeModal();
+                    setTimeout(() => showUsageNotice(false), 260);
+                };
+
+                customModalConfirm.innerText = '聯絡購買授權';
+                customModalConfirm.onclick = () => {
+                    window.location.href = 'mailto:khlin712@gmail.com?subject=%E5%AE%B6%E6%97%8F%E7%B3%BB%E7%B5%B1%E5%9C%96%E5%B7%A5%E5%85%B7%E8%B3%BC%E8%B2%B7%E6%8E%88%E6%AC%8A';
+                };
             });
         }
 
@@ -2407,6 +2429,12 @@
                 clonedDrawArea.style.marginTop = '0';
                 clonedDrawArea.style.transform = 'none';
                 clonedDrawArea.style.position = 'relative';
+
+                // PDF 匯出：保留 glow-gold 金色閃爍提示效果。
+                // 不移除 glow-gold、不停用 animation/filter；僅確保 SVG 外溢可見，避免圖樣被裁切。
+                clonedDrawArea.querySelectorAll('svg').forEach(svg => {
+                    svg.style.overflow = 'visible';
+                });
 
                 const exportRoot = document.createElement('div');
                 exportRoot.className = 'pdf-export-root';
