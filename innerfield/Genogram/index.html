@@ -121,8 +121,14 @@
         }
 
         .pdf-export-root {
+            /*
+              PDF 匯出修正：不要把匯出容器放到 left:-99999px。
+              GitHub Pages / Chrome 在 html2canvas 擷取極遠離視窗的 SVG 時，
+              容易出現方形、圓形只剩半邊、背景網格消失、PDF 檔案變小的問題。
+              改成放在頁面原點、但置於畫面後方，讓瀏覽器以穩定座標完整渲染後再截圖。
+            */
             position: fixed;
-            left: -99999px;
+            left: 0;
             top: 0;
             width: 2200px;
             height: 1538px;
@@ -130,7 +136,8 @@
             color: #1f2937;
             padding: 14px 18px 16px;
             box-sizing: border-box;
-            z-index: -1;
+            z-index: -9999;
+            pointer-events: none;
             overflow: hidden;
         }
         .pdf-export-root .pdf-header {
@@ -2369,19 +2376,6 @@
             return new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         }
 
-        async function waitForPDFReady() {
-            if (document.fonts && document.fonts.ready) {
-                try {
-                    await document.fonts.ready;
-                } catch (_) {}
-            }
-
-            await waitForNextPaint();
-            await waitForNextPaint();
-
-            await new Promise(resolve => setTimeout(resolve, 150));
-        }
-
         function normalizePDFLabelPositions(exportRoot) {
             const marriageLabels = exportRoot.querySelectorAll('[id^="label-"]');
             marriageLabels.forEach(label => {
@@ -2463,6 +2457,27 @@
             drawArea.style.transform = `matrix(${scale}, 0, 0, ${scale}, ${tx}, ${ty})`;
         }
 
+        async function waitForExportAssetsReady() {
+            // 等待 Google Fonts / Noto Sans TC 等字體完成，避免 GitHub Pages 上字體尚未載入就匯出。
+            if (document.fonts && document.fonts.ready) {
+                try { await document.fonts.ready; } catch (_) {}
+            }
+
+            // 等待目前頁面圖片與 SVG image 完成載入。
+            const images = Array.from(document.images || []);
+            await Promise.all(images.map(img => {
+                if (img.complete) return Promise.resolve();
+                return new Promise(resolve => {
+                    img.onload = resolve;
+                    img.onerror = resolve;
+                });
+            }));
+
+            // 連續等待數次 repaint，讓 clone 後的 flex / SVG / canvas 座標在各環境一致。
+            await waitForNextPaint();
+            await waitForNextPaint();
+        }
+
         async function exportPDF() {
             try {
                 if (!window.html2canvas || !window.jspdf) {
@@ -2477,7 +2492,7 @@
                 syncGlobalFieldsWithoutHistory();
                 closeDrawer();
                 drawSVGLines();
-                await waitForNextPaint();
+                await waitForExportAssetsReady();
 
                 const originalDrawArea = document.getElementById('draw-area');
                 const clonedDrawArea = originalDrawArea.cloneNode(true);
@@ -2526,22 +2541,39 @@
                 exportRoot.querySelector('.pdf-chart-stage').appendChild(clonedDrawArea);
                 document.body.appendChild(exportRoot);
 
-                await waitForNextPaint();
+                // 固定 clone 後的尺寸，避免不同瀏覽器環境因 flex / viewport 計算差異造成 SVG 裁切。
+                clonedDrawArea.style.width = '2200px';
+                clonedDrawArea.style.minWidth = '2200px';
+                clonedDrawArea.style.height = 'auto';
+                clonedDrawArea.style.overflow = 'visible';
+                clonedDrawArea.querySelectorAll('.node-container, .node-container > div, svg').forEach(el => {
+                    el.style.overflow = 'visible';
+                });
+
+                await waitForExportAssetsReady();
                 // PDF 使用複製後的 draw-area 重新計算線段，避免沿用螢幕版座標造成右側線段斷裂或偏移。
                 redrawSVGLinesInDrawArea(clonedDrawArea);
                 await waitForNextPaint();
                 normalizePDFLabelPositions(exportRoot);
                 await waitForNextPaint();
                 fitPDFChartToStage(exportRoot);
-                await waitForPDFReady();
+                await waitForNextPaint();
 
+                const exportWidth = 2200;
+                const exportHeight = 1538;
                 const canvas = await html2canvas(exportRoot, {
                     backgroundColor: '#fdfbf7',
                     scale: 3,
                     useCORS: true,
                     allowTaint: true,
-                    windowWidth: exportRoot.scrollWidth,
-                    windowHeight: exportRoot.scrollHeight
+                    logging: false,
+                    foreignObjectRendering: false,
+                    width: exportWidth,
+                    height: exportHeight,
+                    windowWidth: exportWidth,
+                    windowHeight: exportHeight,
+                    scrollX: 0,
+                    scrollY: 0
                 });
 
                 exportRoot.remove();
