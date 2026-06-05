@@ -2369,6 +2369,19 @@
             return new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         }
 
+        async function waitForPDFReady() {
+            if (document.fonts && document.fonts.ready) {
+                try {
+                    await document.fonts.ready;
+                } catch (_) {}
+            }
+
+            await waitForNextPaint();
+            await waitForNextPaint();
+
+            await new Promise(resolve => setTimeout(resolve, 150));
+        }
+
         function normalizePDFLabelPositions(exportRoot) {
             const marriageLabels = exportRoot.querySelectorAll('[id^="label-"]');
             marriageLabels.forEach(label => {
@@ -2520,7 +2533,7 @@
                 normalizePDFLabelPositions(exportRoot);
                 await waitForNextPaint();
                 fitPDFChartToStage(exportRoot);
-                await waitForNextPaint();
+                await waitForPDFReady();
 
                 const canvas = await html2canvas(exportRoot, {
                     backgroundColor: '#fdfbf7',
