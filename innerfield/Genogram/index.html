@@ -9,6 +9,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" referrerpolicy="no-referrer"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --v-gap: 8rem;
+            --h-fam-gap: 10rem;
+            --h-sib-gap: 1rem;
+            --text-scale: 1;
+            --left-text-scale: 1.4;
+        }
+
         body {
             font-family: 'Noto Sans TC', sans-serif;
             background-color: #fdfbf7;
@@ -27,6 +35,41 @@
             background-position: -1px -1px;
         }
         
+        /* 版面變數應用 classes */
+        .mt-vgap { margin-top: var(--v-gap, 8rem) !important; }
+        .mt-vgap-role { margin-top: calc(var(--v-gap, 8rem) + 1rem) !important; }
+        .gap-hfam { gap: var(--h-fam-gap, 10rem) !important; }
+        .gap-hsib { gap: var(--h-sib-gap, 1rem) !important; }
+        .gap-hgroup { gap: calc(var(--h-sib-gap, 1rem) * 2) !important; }
+        .gap-hcf { gap: calc(var(--h-sib-gap, 1rem) * 3) !important; }
+
+        /* --- 動態文字縮放控制 --- */
+        #draw-area .text-xs { font-size: calc(0.75rem * var(--text-scale)) !important; line-height: calc(1rem * var(--text-scale)) !important; }
+        #draw-area .text-sm { font-size: calc(0.875rem * var(--text-scale)) !important; line-height: calc(1.25rem * var(--text-scale)) !important; }
+        #draw-area .text-\\[9px\\] { font-size: calc(9px * var(--text-scale)) !important; line-height: calc(12px * var(--text-scale)) !important; }
+        #draw-area .text-\\[10px\\] { font-size: calc(10px * var(--text-scale)) !important; line-height: calc(14px * var(--text-scale)) !important; }
+        #draw-area .text-\\[11px\\] { font-size: calc(11px * var(--text-scale)) !important; line-height: calc(16px * var(--text-scale)) !important; }
+        
+        #draw-area .person-note-label { 
+            font-size: calc(11px * var(--text-scale)) !important; 
+            line-height: calc(1.25 * var(--text-scale)) !important; 
+            max-width: calc(120px * var(--text-scale)) !important;
+        }
+        
+        #draw-area .adoption-label, #draw-area .waisheng-label {
+            max-width: calc(160px * var(--text-scale)) !important;
+        }
+        
+        #draw-area [id^="label-"] { 
+            font-size: calc(12px * var(--text-scale)) !important; 
+            line-height: calc(1.25 * var(--text-scale)) !important;
+            max-width: calc(180px * var(--text-scale)) !important;
+        }
+        #draw-area [id^="label-"] span { font-size: calc(10px * var(--text-scale)) !important; }
+        
+        #draw-area .w-\\[90px\\] { width: calc(90px * var(--text-scale)) !important; }
+        /* -------------------------- */
+
         .node-container { transition: transform 0.15s ease, filter 0.15s ease; }
         .node-container:hover { transform: scale(1.1); z-index: 50; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
         
@@ -44,7 +87,6 @@
             animation: goldGlow 2s infinite ease-in-out;
         }
 
-
         @keyframes guideGreenBorderPulse {
             0%, 100% { border-color: #22c55e; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.45), 0 0 10px rgba(34, 197, 94, 0.28); }
             50% { border-color: #16a34a; box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.10), 0 0 18px rgba(34, 197, 94, 0.55); }
@@ -53,305 +95,153 @@
             border: 2px solid #22c55e !important;
             animation: guideGreenBorderPulse 1.35s infinite ease-in-out;
         }
-        .operation-guide-button:hover {
-            background: #ecfdf5 !important;
-        }
+        .operation-guide-button:hover { background: #ecfdf5 !important; }
 
-        /* 左側欄收合把手：加大可點擊範圍，收合後仍明顯露出 */
+
+        /* 左方欄位文字獨立縮放 */
+        #left-sidebar h3 { font-size: calc(0.875rem * var(--left-text-scale)) !important; line-height: calc(1.25rem * var(--left-text-scale)) !important; }
+        #left-sidebar p { font-size: calc(11px * var(--left-text-scale)) !important; line-height: calc(1.15 * var(--left-text-scale)) !important; }
+        #left-sidebar textarea { font-size: calc(0.875rem * var(--left-text-scale)) !important; line-height: calc(1.25rem * var(--left-text-scale)) !important; }
+        .pdf-export-root .pdf-note-title { font-size: calc(15px * var(--left-text-scale)) !important; line-height: calc(1.25 * var(--left-text-scale)) !important; }
+        .pdf-export-root .pdf-note-content { font-size: calc(13px * var(--left-text-scale)) !important; line-height: calc(1.42 * var(--left-text-scale)) !important; }
+
+        /* 滑桿樣式 */
+        input[type=range] {
+            -webkit-appearance: none; 
+            width: 100%;
+            background: transparent; 
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        input[type=range]:focus { outline: none; }
+
+        /* 自訂細滾動條 (給 Modal 內部用) */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
+
         .left-sidebar-toggle-handle {
-            width: 42px;
-            height: 86px;
-            right: -34px;
+            width: 42px; height: 86px; right: -34px;
             border-radius: 0 9999px 9999px 0;
             background: rgba(255, 255, 255, 0.96);
-            border: 1px solid #bfdbfe;
-            border-left: 0;
+            border: 1px solid #bfdbfe; border-left: 0;
             box-shadow: 0 10px 22px rgba(30, 64, 175, 0.18);
             color: #2563eb;
         }
         .left-sidebar-toggle-handle:hover {
-            width: 48px;
-            right: -40px;
-            background: #eff6ff;
-            color: #1d4ed8;
-            box-shadow: 0 12px 28px rgba(30, 64, 175, 0.28);
+            width: 48px; right: -40px; background: #eff6ff;
+            color: #1d4ed8; box-shadow: 0 12px 28px rgba(30, 64, 175, 0.28);
         }
-        .left-sidebar-toggle-handle:active {
-            transform: translateY(-50%) scale(0.98);
-        }
+        .left-sidebar-toggle-handle:active { transform: translateY(-50%) scale(0.98); }
         .left-sidebar-toggle-handle .toggle-grip {
-            position: absolute;
-            left: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+            position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 4px;
         }
         .left-sidebar-toggle-handle .toggle-grip span {
-            width: 3px;
-            height: 3px;
-            border-radius: 9999px;
-            background: currentColor;
-            opacity: 0.45;
+            width: 3px; height: 3px; border-radius: 9999px;
+            background: currentColor; opacity: 0.45;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 頂部工具列可左右橫向捲動，避免小視窗時按鈕被擠出畫面 */
         .top-toolbar {
-            overflow-x: auto;
-            overflow-y: hidden;
-            -webkit-overflow-scrolling: touch;
-            touch-action: pan-x;
-            gap: 1rem;
+            overflow-x: auto; overflow-y: hidden;
+            -webkit-overflow-scrolling: touch; touch-action: pan-x; gap: 1rem;
         }
-        .top-toolbar > div {
-            flex-shrink: 0;
-        }
+        .top-toolbar > div { flex-shrink: 0; }
         .top-toolbar-scroll-hint {
-            position: sticky;
-            right: 0;
-            width: 22px;
-            align-self: stretch;
-            flex: 0 0 22px;
-            pointer-events: none;
-            background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.96));
+            position: sticky; right: 0; width: 22px; align-self: stretch; flex: 0 0 22px;
+            pointer-events: none; background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.96));
         }
 
         .pdf-export-root {
-            /*
-              PDF 匯出修正：不要把匯出容器放到 left:-99999px。
-              GitHub Pages / Chrome 在 html2canvas 擷取極遠離視窗的 SVG 時，
-              容易出現方形、圓形只剩半邊、背景網格消失、PDF 檔案變小的問題。
-              改成放在頁面原點、但置於畫面後方，讓瀏覽器以穩定座標完整渲染後再截圖。
-            */
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 2200px;
-            height: 1538px;
-            background: #fdfbf7;
-            color: #1f2937;
-            padding: 14px 18px 16px;
-            box-sizing: border-box;
-            z-index: -9999;
-            pointer-events: none;
-            overflow: hidden;
+            position: fixed; left: 0; top: 0; width: 2200px; height: 1538px;
+            background: #fdfbf7; color: #1f2937; padding: 14px 18px 16px;
+            box-sizing: border-box; z-index: -9999; pointer-events: none; overflow: hidden;
         }
-        .pdf-export-root .pdf-header {
-            display: flex;
-            align-items: baseline;
-            gap: 18px;
-            height: 38px;
-            margin-bottom: 8px;
-        }
-        .pdf-export-root .pdf-title {
-            font-size: 25px;
-            font-weight: 700;
-            color: #1e3a8a;
-            margin: 0;
-            line-height: 1.1;
-        }
-        .pdf-export-root .pdf-meta {
-            font-size: 25px;
-            font-weight: 700;
-            color: #1e3a8a;
-            margin: 0;
-            line-height: 1.1;
-        }
+        .pdf-export-root .pdf-header { display: flex; align-items: baseline; gap: 18px; height: 38px; margin-bottom: 8px; }
+        .pdf-export-root .pdf-title { font-size: 25px; font-weight: 700; color: #1e3a8a; margin: 0; line-height: 1.1; }
+        .pdf-export-root .pdf-meta { font-size: 25px; font-weight: 700; color: #1e3a8a; margin: 0; line-height: 1.1; }
         .pdf-export-root .pdf-chart-wrap {
-            position: relative;
-            height: calc(100% - 46px);
-            background-color: #f8fafc;
-            background-image:
-                linear-gradient(#e2e8f0 1px, transparent 1px),
-                linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
-            background-size: 2rem 2rem;
-            background-position: -1px -1px;
-            border: 1px solid #cbd5e1;
-            border-radius: 16px;
-            padding: 0;
-            overflow: hidden;
-            box-sizing: border-box;
+            position: relative; height: calc(100% - 46px); background-color: #f8fafc;
+            background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 2rem 2rem; background-position: -1px -1px;
+            border: 1px solid #cbd5e1; border-radius: 16px; padding: 0; overflow: hidden; box-sizing: border-box;
         }
         .pdf-export-root .pdf-notes {
-            position: absolute;
-            left: 18px;
-            top: 18px;
-            bottom: 18px;
-            width: 335px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            z-index: 80;
-            pointer-events: none;
+            position: absolute; left: 18px; top: 18px; bottom: 18px; width: 335px;
+            display: flex; flex-direction: column; gap: 12px; z-index: 80; pointer-events: none;
         }
         .pdf-export-root .pdf-note-card {
-            background: rgba(255, 255, 255, 0.88);
-            border: 1px solid #dbeafe;
-            border-radius: 11px;
-            padding: 10px 12px;
-            flex: 1 1 0;
-            min-height: 0;
-            overflow: hidden;
-            break-inside: avoid;
-            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.88); border: 1px solid #dbeafe; border-radius: 11px;
+            padding: 10px 12px; flex: 1 1 0; min-height: 0; overflow: hidden; break-inside: avoid; box-sizing: border-box;
         }
-        .pdf-export-root .pdf-note-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: #1e40af;
-            margin-bottom: 5px;
-            line-height: 1.25;
-        }
-        .pdf-export-root .pdf-note-content {
-            font-size: 13px;
-            line-height: 1.42;
-            white-space: pre-wrap;
-            color: #374151;
-            overflow-wrap: anywhere;
-        }
-        .pdf-export-root .pdf-chart-stage {
-            position: absolute;
-            left: 375px;
-            right: 18px;
-            top: 18px;
-            bottom: 18px;
-            overflow: hidden;
-        }
+        .pdf-export-root .pdf-note-title { font-size: 15px; font-weight: 700; color: #1e40af; margin-bottom: 5px; line-height: 1.25; }
+        .pdf-export-root .pdf-note-content { font-size: 13px; line-height: 1.42; white-space: pre-wrap; color: #374151; overflow-wrap: anywhere; }
+        .pdf-export-root .pdf-chart-stage { position: absolute; left: 375px; right: 18px; top: 18px; bottom: 18px; overflow: hidden; }
         .pdf-export-root .pdf-chart-stage > #draw-area {
-            position: absolute !important;
-            margin: 0 !important;
-            left: 0;
-            top: 0;
-            transform-origin: 0 0 !important;
+            position: absolute !important; margin: 0 !important; left: 0; top: 0; transform-origin: 0 0 !important;
         }
-        .pdf-export-root .hide-on-present {
-            display: none !important;
-        }
-        .pdf-export-root .no-print,
-        .pdf-export-root .btn-interactive {
-            visibility: hidden !important;
-            pointer-events: none !important;
-        }
+        .pdf-export-root .hide-on-present { display: none !important; }
+        .pdf-export-root .no-print, .pdf-export-root .btn-interactive { visibility: hidden !important; pointer-events: none !important; }
 
-        /* PDF 匯出：所有「特別標示」保留框線，避免只剩文字而不易辨識 */
         .pdf-export-root [id^="label-"] {
-            background: rgba(255,255,255,0.92) !important;
-            border: 1px solid #93c5fd !important;
-            box-shadow: 0 1px 2px rgba(30, 64, 175, 0.12) !important;
-            padding: 2px 6px !important;
-            border-radius: 5px !important;
+            background: rgba(255,255,255,0.92) !important; border: 1px solid #93c5fd !important;
+            box-shadow: 0 1px 2px rgba(30, 64, 175, 0.12) !important; padding: 2px 6px !important; border-radius: 5px !important;
         }
-        .pdf-export-root [id^="label-"] span {
-            background: transparent !important;
-        }
-        /* PDF 匯出：手足稱謂等小標籤只保留文字，移除框線、底色與陰影 */
+        .pdf-export-root [id^="label-"] span { background: transparent !important; }
         .pdf-export-root .node-container > .absolute[class*="-top-7"] {
-            background: transparent !important;
-            border-color: transparent !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            border-radius: 0 !important;
+            background: transparent !important; border-color: transparent !important; box-shadow: none !important; padding: 0 !important; border-radius: 0 !important;
         }
 
+        .waisheng-label, .adoption-label {
+            border-width: 1px !important; border-style: solid !important; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12) !important;
+        }
+        .pdf-export-root .waisheng-label, .pdf-export-root .adoption-label {
+            background: rgba(255,255,255,0.94) !important; border-color: #f59e0b !important; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.10) !important;
+            padding: 4px 6px !important; border-radius: 6px !important;
+        }
+        .pdf-export-root .adoption-label { border-color: #8b5cf6 !important; }
+        .pdf-export-root .waisheng-label .label-badge, .pdf-export-root .adoption-label .label-badge { padding: 0 2px !important; border-radius: 3px !important; }
+        .pdf-export-root .waisheng-label .label-divider { border-bottom-color: rgba(245, 158, 11, 0.35) !important; padding-bottom: 2px !important; margin-bottom: 2px !important; }
 
-        /* 特別標示：外省背景、收養、出養，在操作版與 PDF 都加上框框 */
-        .waisheng-label,
-        .adoption-label {
-            border-width: 1px !important;
-            border-style: solid !important;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12) !important;
-        }
-        .pdf-export-root .waisheng-label,
-        .pdf-export-root .adoption-label {
-            background: rgba(255,255,255,0.94) !important;
-            border-color: #f59e0b !important;
-            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.10) !important;
-            padding: 4px 6px !important;
-            border-radius: 6px !important;
-        }
-        .pdf-export-root .adoption-label {
-            border-color: #8b5cf6 !important;
-        }
-        .pdf-export-root .waisheng-label .label-badge,
-        .pdf-export-root .adoption-label .label-badge {
-            padding: 0 2px !important;
-            border-radius: 3px !important;
-        }
-        .pdf-export-root .waisheng-label .label-divider {
-            border-bottom-color: rgba(245, 158, 11, 0.35) !important;
-            padding-bottom: 2px !important;
-            margin-bottom: 2px !important;
-        }
-
-        /* 個人註記：每位成員可顯示不超過 20 字的簡短註記 */
         .person-note-label {
-            max-width: 120px;
-            color: #334155;
-            font-size: 11px;
-            line-height: 1.25;
-            text-align: center;
-            overflow-wrap: anywhere;
-            white-space: normal;
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.92);
-            border: 1px solid #94a3b8;
-            border-radius: 6px;
-            padding: 2px 5px;
-            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.10);
+            color: #334155; font-size: 11px; line-height: 1.25; text-align: center; overflow-wrap: anywhere; white-space: normal;
+            display: inline-block; background: rgba(255, 255, 255, 0.92); border: 1px solid #94a3b8; border-radius: 6px; padding: 2px 5px; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.10);
         }
         .pdf-export-root .person-note-label {
-            font-size: 12px;
-            color: #334155;
-            background: rgba(255, 255, 255, 0.96) !important;
-            border: 1px solid #64748b !important;
-            border-radius: 6px !important;
-            padding: 2px 5px !important;
-            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.10) !important;
+            font-size: calc(12px * var(--text-scale)) !important; color: #334155; background: rgba(255, 255, 255, 0.96) !important; border: 1px solid #64748b !important;
+            border-radius: 6px !important; padding: 2px 5px !important; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.10) !important;
         }
 
-
-
-        /* PDF 匯出：關係、手足稱謂、外省背景、收養／出養、個人註記等標示全部移除框線、底色、陰影，只保留文字 */
-        .pdf-export-root [id^="label-"],
-        .pdf-export-root .node-container > .absolute[class*="-top-7"],
-        .pdf-export-root .waisheng-label,
-        .pdf-export-root .adoption-label,
-        .pdf-export-root .person-note-label {
-            background: transparent !important;
-            border: 0 !important;
-            border-color: transparent !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            border-radius: 0 !important;
+        .pdf-export-root [id^="label-"], .pdf-export-root .node-container > .absolute[class*="-top-7"],
+        .pdf-export-root .waisheng-label, .pdf-export-root .adoption-label, .pdf-export-root .person-note-label {
+            background: transparent !important; border: 0 !important; border-color: transparent !important; box-shadow: none !important; padding: 0 !important; border-radius: 0 !important;
         }
-        .pdf-export-root [id^="label-"] span,
-        .pdf-export-root .waisheng-label .label-badge,
-        .pdf-export-root .adoption-label .label-badge,
-        .pdf-export-root .waisheng-label .label-divider {
-            background: transparent !important;
-            border: 0 !important;
-            border-color: transparent !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            margin-bottom: 1px !important;
-            border-radius: 0 !important;
-            color: inherit !important;
+        .pdf-export-root [id^="label-"] span, .pdf-export-root .waisheng-label .label-badge,
+        .pdf-export-root .adoption-label .label-badge, .pdf-export-root .waisheng-label .label-divider {
+            background: transparent !important; border: 0 !important; border-color: transparent !important; box-shadow: none !important; padding: 0 !important; margin-bottom: 1px !important; border-radius: 0 !important; color: inherit !important;
         }
 
-
-        /* PDF 匯出：保留 glow-gold 金色閃爍提示效果。
-           只確保 SVG 外溢可見，不移除 glow-gold、不停用 animation/filter。 */
-        .pdf-export-root .node-container svg,
-        .pdf-export-root svg.glow-gold {
-            overflow: visible !important;
-        }
-        .pdf-export-root .glow-gold {
-            animation: goldGlow 2s infinite ease-in-out !important;
-        }
+        .pdf-export-root .node-container svg, .pdf-export-root svg.glow-gold { overflow: visible !important; }
+        .pdf-export-root .glow-gold { animation: goldGlow 2s infinite ease-in-out !important; }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col text-gray-800 relative">
@@ -368,7 +258,6 @@
                 <input type="text" id="client-name" class="px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none w-32 bg-gray-50 hover:bg-white transition" placeholder="請輸入姓名" onchange="updateGlobal()">
             </div>
 
-            <!-- 復原重做與清空重置 -->
             <div class="flex items-center space-x-2 ml-4">
                 <div class="flex space-x-1 border border-gray-200 rounded-lg p-1 bg-gray-50">
                     <button onclick="undo()" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-white rounded transition" title="復原 (Ctrl+Z)">
@@ -387,15 +276,20 @@
         <div class="flex items-center space-x-2 shrink-0">
             <button onclick="showUsageNotice()" class="px-3 py-1.5 text-sm font-extrabold text-amber-700 bg-amber-50 border-2 border-amber-300 rounded-lg hover:bg-amber-100 transition shadow-sm" title="使用聲明" aria-label="使用聲明">！</button>
             <button onclick="showOperationGuide()" class="operation-guide-button px-3 py-1.5 text-sm font-bold text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition" title="操作說明">操作說明</button>
+            
+            <button onclick="openLayoutModal()" class="px-3 py-1.5 text-sm font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition shadow-sm" title="版面與圖形大小設定">
+                <svg class="w-4 h-4 mr-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                版面調整
+            </button>
+
             <button onclick="zoomIn()" class="p-2 text-gray-600 hover:bg-gray-100 rounded" title="放大"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg></button>
             <button onclick="zoomOut()" class="p-2 text-gray-600 hover:bg-gray-100 rounded" title="縮小"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path></svg></button>
             <div class="w-px h-6 bg-gray-300 mx-1"></div>
-            <button onclick="exportPDF()" class="px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded hover:bg-red-100">匯出 PDF</button>
-            <button onclick="exportJSON()" class="px-3 py-1.5 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded hover:bg-green-100">下載 JSON</button>
-            <label class="px-3 py-1.5 text-sm font-medium text-purple-700 bg-purple-50 border border-purple-200 rounded hover:bg-purple-100 cursor-pointer">
-                匯入 JSON
-                <input type="file" id="import-json" class="hidden" accept=".json" onchange="importJSON(event)">
-            </label>
+            <button onclick="showFileMenu()" class="px-3 py-1.5 text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition shadow-sm" title="檔案操作">
+                <svg class="w-4 h-4 mr-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"></path></svg>
+                檔案
+            </button>
+            <input type="file" id="import-json" class="hidden" accept=".json" onchange="importJSON(event)">
         </div>
         <div class="top-toolbar-scroll-hint" aria-hidden="true"></div>
     </nav>
@@ -462,11 +356,11 @@
 
                     <!-- L1: Grandparents -->
                     <div class="flex justify-between w-full relative z-10 mb-12">
-                        <div class="flex justify-center items-start gap-40 w-1/2 relative" id="pg-container">
+                        <div class="flex justify-center items-start gap-hfam w-1/2 relative" id="pg-container">
                             <div id="wrap-pg_h"></div>
                             <div id="wrap-pg_w"></div>
                         </div>
-                        <div class="flex justify-center items-start gap-40 w-1/2 relative" id="mg-container">
+                        <div class="flex justify-center items-start gap-hfam w-1/2 relative" id="mg-container">
                             <div id="wrap-mg_h"></div>
                             <div id="wrap-mg_w"></div>
                         </div>
@@ -474,22 +368,22 @@
 
                     <!-- L1.5: Parents generation -->
                     <div class="flex justify-between w-full relative z-10">
-                        <div class="flex justify-center items-start gap-4 w-1/2" id="paternal-children-container"></div>
-                        <div class="flex justify-center items-start gap-4 w-1/2" id="maternal-children-container"></div>
+                        <div class="flex justify-center items-start gap-hsib w-1/2" id="paternal-children-container"></div>
+                        <div class="flex justify-center items-start gap-hsib w-1/2" id="maternal-children-container"></div>
                     </div>
 
                     <!-- L2: Client Generation -->
-                    <div class="flex flex-col items-center mt-32 z-10 w-full relative">
+                    <div class="flex flex-col items-center mt-vgap z-10 w-full relative">
                         <div class="flex justify-center items-start w-full">
-                            <div class="flex justify-end items-start gap-8 pr-12" id="father-extra-children-container"></div>
-                            <div class="flex justify-center items-start gap-8" id="client-children-container"></div>
-                            <div class="flex justify-start items-start gap-8 pl-12" id="mother-extra-children-container"></div>
+                            <div class="flex justify-end items-start gap-hgroup pr-12" id="father-extra-children-container"></div>
+                            <div class="flex justify-center items-start gap-hgroup" id="client-children-container"></div>
+                            <div class="flex justify-start items-start gap-hgroup pl-12" id="mother-extra-children-container"></div>
                         </div>
                     </div>
 
                     <!-- L3: Client's Children Generation -->
-                    <div class="flex flex-col items-center mt-32 z-10 w-full relative">
-                        <div class="flex items-start justify-center gap-12" id="client-family-children-container"></div>
+                    <div class="flex flex-col items-center mt-vgap z-10 w-full relative">
+                        <div class="flex items-start justify-center gap-hcf" id="client-family-children-container"></div>
                     </div>
 
                 </div>
@@ -622,6 +516,83 @@
 
     </div>
 
+    <!-- 版面與圖形調整 Modal -->
+    <div id="layout-modal" class="fixed inset-0 bg-black/40 z-[100] hidden flex-col items-center justify-center transition-opacity opacity-0 backdrop-blur-sm no-print">
+        <div id="layout-modal-content" class="bg-white rounded-xl shadow-2xl w-[min(92vw,400px)] p-6 transform scale-95 transition-transform duration-200 flex flex-col">
+            <div class="flex justify-between items-center mb-5 border-b pb-3">
+                <h3 class="text-lg font-bold text-gray-900 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    版面與圖形調整
+                </h3>
+                <button onclick="closeLayoutModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="space-y-6 overflow-y-auto max-h-[60vh] pr-2 custom-scrollbar">
+                <div>
+                    <label class="flex justify-between text-sm font-medium text-gray-700 mb-2">
+                        <span>圖形大小</span>
+                        <span id="val-node-scale" class="text-indigo-600 font-bold">140%</span>
+                    </label>
+                    <input type="range" id="range-node-scale" min="0.3" max="3.0" step="0.1" value="1.4" oninput="applyLayoutSettings()">
+                    <div class="flex justify-between text-[10px] text-gray-400 mt-1"><span>極小 (30%)</span><span>預設</span><span>極大 (300%)</span></div>
+                </div>
+
+                <div>
+                    <label class="flex justify-between text-sm font-medium text-gray-700 mb-2">
+                        <span>文字大小</span>
+                        <span id="val-text-scale" class="text-indigo-600 font-bold">150%</span>
+                    </label>
+                    <input type="range" id="range-text-scale" min="0.5" max="3.0" step="0.1" value="1.5" oninput="applyLayoutSettings()">
+                    <div class="flex justify-between text-[10px] text-gray-400 mt-1"><span>小 (50%)</span><span>預設</span><span>極大 (300%)</span></div>
+                </div>
+
+                <div>
+                    <label class="flex justify-between text-sm font-medium text-gray-700 mb-2">
+                        <span>左方文字大小</span>
+                        <span id="val-left-text-scale" class="text-indigo-600 font-bold">140%</span>
+                    </label>
+                    <input type="range" id="range-left-text-scale" min="0.5" max="3.0" step="0.1" value="1.4" oninput="applyLayoutSettings()">
+                    <div class="flex justify-between text-[10px] text-gray-400 mt-1"><span>小 (50%)</span><span>預設</span><span>極大 (300%)</span></div>
+                    <p class="text-[11px] text-gray-500 mt-1.5 leading-tight">只調整左側欄與 PDF 左方註記文字，不影響家系圖主圖文字。</p>
+                </div>
+                
+                <div>
+                    <label class="flex justify-between text-sm font-medium text-gray-700 mb-2">
+                        <span>垂直世代間距</span>
+                        <span id="val-v-gap" class="text-indigo-600 font-bold">標準</span>
+                    </label>
+                    <input type="range" id="range-v-gap" min="2" max="32" step="1" value="8" oninput="applyLayoutSettings()">
+                    <div class="flex justify-between text-[10px] text-gray-400 mt-1"><span>極緊湊</span><span>預設</span><span>極寬鬆</span></div>
+                </div>
+                
+                <div>
+                    <label class="flex justify-between text-sm font-medium text-gray-700 mb-2">
+                        <span>家族水平間距 (父母/祖父母)</span>
+                        <span id="val-h-fam-gap" class="text-indigo-600 font-bold">標準</span>
+                    </label>
+                    <input type="range" id="range-h-fam-gap" min="1" max="40" step="1" value="10" oninput="applyLayoutSettings()">
+                    <div class="flex justify-between text-[10px] text-gray-400 mt-1"><span>極緊湊</span><span>預設</span><span>極寬鬆</span></div>
+                </div>
+                
+                <div>
+                    <label class="flex justify-between text-sm font-medium text-gray-700 mb-2">
+                        <span>手足與配偶水平間距</span>
+                        <span id="val-h-sib-gap" class="text-indigo-600 font-bold">標準</span>
+                    </label>
+                    <input type="range" id="range-h-sib-gap" min="0" max="12" step="0.5" value="1" oninput="applyLayoutSettings()">
+                    <div class="flex justify-between text-[10px] text-gray-400 mt-1"><span>無間距</span><span>預設</span><span>極寬鬆</span></div>
+                </div>
+            </div>
+            
+            <div class="mt-8 flex justify-end space-x-3">
+                <button onclick="resetLayoutSettings()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition">恢復預設</button>
+                <button onclick="closeLayoutModal()" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">完成</button>
+            </div>
+        </div>
+    </div>
+
     <div id="custom-modal" class="fixed inset-0 bg-black/40 z-[100] hidden flex-col items-center justify-center transition-opacity opacity-0 backdrop-blur-sm no-print">
         <div id="custom-modal-content" class="bg-white rounded-xl shadow-2xl w-[min(92vw,720px)] max-h-[88vh] p-6 transform scale-95 transition-transform duration-200 flex flex-col">
             <h3 id="custom-modal-title" class="text-lg font-bold text-gray-900 mb-2">提示</h3>
@@ -657,7 +628,7 @@
             clientFamilies: [], 
             fatherFamilies: [], 
             motherFamilies: [], 
-            global: { majorEvents: '', hiddenPeople: '', otherNotes: '', expectation: '', facilitatorNotes: '', clientName: '' } 
+            global: { majorEvents: '', hiddenPeople: '', otherNotes: '', expectation: '', facilitatorNotes: '', clientName: '', layout: { nodeScale: 1.4, textScale: 1.5, leftTextScale: 1.4, vGap: 8, hFamGap: 10, hSibGap: 1, presetVersion: 2 } } 
         };
 
         let state = JSON.parse(JSON.stringify(defaultState));
@@ -666,12 +637,15 @@
         if (savedDraft) {
             try {
                 const parsedData = JSON.parse(savedDraft);
-                if(!parsedData.global) parsedData.global = { majorEvents: '', hiddenPeople: '', otherNotes: '', expectation: '', facilitatorNotes: '', clientName: '' };
+                if(!parsedData.global) parsedData.global = { majorEvents: '', hiddenPeople: '', otherNotes: '', expectation: '', facilitatorNotes: '', clientName: '', layout: { nodeScale: 1.4, textScale: 1.5, leftTextScale: 1.4, vGap: 8, hFamGap: 10, hSibGap: 1, presetVersion: 2 } };
                 if(parsedData.global.clientName === undefined) parsedData.global.clientName = '';
                 if(parsedData.global.otherNotes === undefined) parsedData.global.otherNotes = '';
                 if(parsedData.global.expectation === undefined) parsedData.global.expectation = '';
                 if(parsedData.global.facilitatorNotes === undefined) parsedData.global.facilitatorNotes = '';
-                
+                if(parsedData.global.layout === undefined) parsedData.global.layout = { nodeScale: 1, textScale: 1, vGap: 8, hFamGap: 10, hSibGap: 1 };
+                if(parsedData.global.layout.textScale === undefined) parsedData.global.layout.textScale = 1.5;
+                if(parsedData.global.layout.leftTextScale === undefined) parsedData.global.layout.leftTextScale = 1.4;
+
                 if (parsedData.clientFamily && !parsedData.clientFamilies) {
                     parsedData.clientFamilies = [];
                     if (parsedData.clientFamily.spouse) {
@@ -694,7 +668,6 @@
                 if(!parsedData.fatherFamilies) parsedData.fatherFamilies = [];
                 if(!parsedData.motherFamilies) parsedData.motherFamilies = [];
 
-                // 舊版草稿相容：爸爸、媽媽原本沒有外省背景欄位，補上欄位避免編輯時資料未定義。
                 if (parsedData.paternal?.children) {
                     const fatherNode = parsedData.paternal.children.find(c => c.role === 'father' || c.id === 'father');
                     if (fatherNode) {
@@ -710,7 +683,6 @@
                     }
                 }
 
-                // 舊版草稿相容：為所有既有成員補上個人註記欄位。
                 const ensurePersonNoteFields = (node) => {
                     if (!node) return;
                     if (node.personNote === undefined) node.personNote = '';
@@ -731,6 +703,13 @@
                 parsedData.fatherFamilies?.forEach(f => { ensurePersonNoteFields(f.spouse); normalizeNodeStatus(f.spouse); f.children?.forEach(node => { ensurePersonNoteFields(node); normalizeNodeStatus(node); }); });
                 parsedData.motherFamilies?.forEach(f => { ensurePersonNoteFields(f.spouse); normalizeNodeStatus(f.spouse); f.children?.forEach(node => { ensurePersonNoteFields(node); normalizeNodeStatus(node); }); });
 
+                if (!parsedData.global.layout.presetVersion) {
+                    parsedData.global.layout.nodeScale = 1.4;
+                    parsedData.global.layout.textScale = 1.5;
+                    parsedData.global.layout.leftTextScale = 1.4;
+                    parsedData.global.layout.presetVersion = 2;
+                    localStorage.setItem('genogram_draft', JSON.stringify(parsedData));
+                }
                 state = parsedData;
             } catch (e) {
                 console.error("讀取草稿失敗，使用預設值", e);
@@ -791,8 +770,9 @@
         const customModalCancel = document.getElementById('custom-modal-cancel');
         const customModalConfirm = document.getElementById('custom-modal-confirm');
 
-        function showModal({ title = '提示', message, type = 'alert', confirmText = '確定', confirmColor = 'blue', onConfirm }) {
+        function showModal({ title = '提示', message, type = 'alert', confirmText = '確定', confirmColor = 'blue', onConfirm, modalWidth = '' }) {
             customModalTitle.innerText = title;
+            customModalContent.style.width = modalWidth || '';
             customModalMessage.innerHTML = message; 
             
             customModalConfirm.disabled = false;
@@ -826,9 +806,87 @@
             });
         }
 
+        // 版面設定 Modal
+        function openLayoutModal() {
+            const layout = state.global.layout || { nodeScale: 1.4, textScale: 1.5, leftTextScale: 1.4, vGap: 8, hFamGap: 10, hSibGap: 1 };
+            document.getElementById('range-node-scale').value = layout.nodeScale;
+            document.getElementById('range-text-scale').value = layout.textScale;
+            document.getElementById('range-left-text-scale').value = layout.leftTextScale || 1.4;
+            document.getElementById('range-v-gap').value = layout.vGap;
+            document.getElementById('range-h-fam-gap').value = layout.hFamGap;
+            document.getElementById('range-h-sib-gap').value = layout.hSibGap;
+            
+            updateLayoutLabels();
+
+            const modal = document.getElementById('layout-modal');
+            const content = document.getElementById('layout-modal-content');
+            modal.style.display = 'flex';
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    modal.classList.remove('opacity-0');
+                    content.classList.remove('scale-95');
+                });
+            });
+        }
+
+        function closeLayoutModal() {
+            const modal = document.getElementById('layout-modal');
+            const content = document.getElementById('layout-modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }, 200);
+        }
+
+        function applyLayoutSettings() {
+            if(!state.global.layout) state.global.layout = {};
+            state.global.layout.nodeScale = parseFloat(document.getElementById('range-node-scale').value);
+            state.global.layout.textScale = parseFloat(document.getElementById('range-text-scale').value);
+            state.global.layout.leftTextScale = parseFloat(document.getElementById('range-left-text-scale').value);
+            state.global.layout.vGap = parseFloat(document.getElementById('range-v-gap').value);
+            state.global.layout.hFamGap = parseFloat(document.getElementById('range-h-fam-gap').value);
+            state.global.layout.hSibGap = parseFloat(document.getElementById('range-h-sib-gap').value);
+            
+            updateLayoutLabels();
+            renderDOM(); 
+            pushHistory();
+        }
+
+        function updateLayoutLabels() {
+            const scale = document.getElementById('range-node-scale').value;
+            const textScale = document.getElementById('range-text-scale').value;
+            const leftTextScale = document.getElementById('range-left-text-scale').value;
+            document.getElementById('val-node-scale').innerText = Math.round(scale * 100) + '%';
+            document.getElementById('val-text-scale').innerText = Math.round(textScale * 100) + '%';
+            document.getElementById('val-left-text-scale').innerText = Math.round(leftTextScale * 100) + '%';
+            
+            const setLabel = (val, id, normal) => {
+                let text = "標準";
+                if (val < normal) text = "緊湊";
+                if (val > normal) text = "寬鬆";
+                document.getElementById(id).innerText = text;
+            };
+            setLabel(parseFloat(document.getElementById('range-v-gap').value), 'val-v-gap', 8);
+            setLabel(parseFloat(document.getElementById('range-h-fam-gap').value), 'val-h-fam-gap', 10);
+            setLabel(parseFloat(document.getElementById('range-h-sib-gap').value), 'val-h-sib-gap', 1);
+        }
+
+        function resetLayoutSettings() {
+            document.getElementById('range-node-scale').value = 1.4;
+            document.getElementById('range-text-scale').value = 1.5;
+            document.getElementById('range-left-text-scale').value = 1.4;
+            document.getElementById('range-v-gap').value = 8;
+            document.getElementById('range-h-fam-gap').value = 10;
+            document.getElementById('range-h-sib-gap').value = 1;
+            applyLayoutSettings();
+        }
+
 
         const usageNoticeHTML = `
-            <div class="text-left space-y-4 leading-relaxed max-h-[65vh] overflow-y-auto pr-1">
+            <div class="text-left space-y-4 leading-relaxed max-h-[65vh] overflow-y-auto pr-1 custom-scrollbar">
                 <section class="rounded-xl border border-amber-200 bg-amber-50 p-4 space-y-2">
                     <h4 class="text-base font-bold text-amber-950">使用前請確認授權</h4>
                     <p class="text-sm text-amber-950">本工具僅供已取得合法授權者使用。未取得授權者，不得操作、下載、轉傳、截圖教學、錄影示範、複製、改作、拆解程式或提供他人使用。</p>
@@ -903,8 +961,6 @@
                 </section>
             </div>
         `;
-
-        const authorizationInfoHTML = usageNoticeHTML;
 
         function showAuthorizationInfo() {
             showUsageNotice(false);
@@ -1007,7 +1063,7 @@
                             <li><b>左側欄填整體資訊</b>：重大事件、被排除或遺忘的人、期待收穫與其他補充。</li>
                             <li><b>完成後先下載 JSON 備份</b>，再匯出 PDF，避免資料遺失。</li>
                         </ol>
-                        <p class="text-xs text-gray-500 border-t pt-3">畫布操作：拖曳空白處可移動畫面；滑鼠滾輪或上方按鈕可放大縮小。</p>
+                        <p class="text-xs text-gray-500 border-t pt-3">畫布操作：拖曳空白處可移動畫面；滑鼠滾輪或上方按鈕可放大縮小。<br>排版操作：點選上方「版面調整」可自由縮放間距或圖形/文字大小。</p>
                     </div>
                 `,
                 type: 'alert',
@@ -1042,7 +1098,7 @@
         }
 
         viewport.addEventListener('mousedown', (e) => {
-            if(e.target.closest('.node-container') || e.target.closest('.btn-interactive')) return;
+            if(e.target.closest('.node-container') || e.target.closest('.btn-interactive') || e.target.closest('[id^="label-"]')) return;
             isDragging = true;
             startX = e.clientX - panX;
             startY = e.clientY - panY;
@@ -1066,7 +1122,7 @@
         });
 
         viewport.addEventListener('wheel', (e) => {
-            if(e.target.closest('#right-drawer') || e.target.closest('aside')) return;
+            if(e.target.closest('#right-drawer') || e.target.closest('aside') || e.target.closest('#layout-modal')) return;
             e.preventDefault();
             const zoomSensitivity = 0.002;
             const delta = -e.deltaY * zoomSensitivity;
@@ -1086,7 +1142,7 @@
         }, {passive: false});
 
         viewport.addEventListener('touchstart', (e) => {
-            if(e.target.closest('.node-container') || e.target.closest('.btn-interactive')) return;
+            if(e.target.closest('.node-container') || e.target.closest('.btn-interactive') || e.target.closest('[id^="label-"]')) return;
             
             if (e.touches.length === 1) {
                 isDragging = true;
@@ -1103,7 +1159,7 @@
         }, { passive: false });
 
         viewport.addEventListener('touchmove', (e) => {
-            if(e.target.closest('.node-container') || e.target.closest('.btn-interactive')) return;
+            if(e.target.closest('.node-container') || e.target.closest('.btn-interactive') || e.target.closest('[id^="label-"]')) return;
             e.preventDefault(); 
             
             if (e.touches.length === 1 && isDragging) {
@@ -1181,15 +1237,15 @@
         }
 
         function renderShape(node, incomplete) {
-            // PDF 修正重點：所有圖形都必須完整落在 SVG viewBox 內。
-            // 原本把方形/圓形/三角形放大到 viewBox 外（負座標或超過 50），
-            // html2canvas 匯出 PDF 時容易把外溢部分裁切，造成圓形、方形、三角形變形。
-            const size = 64;
+            const layout = state.global.layout || { nodeScale: 1 };
+            const scale = layout.nodeScale || 1;
+            const size = 64 * scale;
             const c = 32;
             const strokeColor = "#1e3a8a";
             const glowClass = incomplete ? "glow-gold" : "";
             
-            let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" class="relative z-0 ${glowClass}" style="overflow: visible;">`;
+            // 透過 viewBox 維持原始座標系，但拉大實體 size 達到完美放大
+            let svg = `<svg width="${size}" height="${size}" viewBox="0 0 64 64" class="relative z-0 ${glowClass}" style="overflow: visible;">`;
             
             if (node.type === 'male') {
                 svg += `<rect x="6" y="6" width="52" height="52" fill="white" stroke="${strokeColor}" stroke-width="2.8" rx="3.5"/>`;
@@ -1253,7 +1309,7 @@
                 let reasonHtml = node.waishengrenReason ? `<div class="text-gray-700 mt-1 font-normal leading-snug whitespace-pre-wrap">${node.waishengrenReason}</div>` : "";
                 let positionClass = node.type === 'male' ? "right-full mr-2.5" : "left-full ml-2.5";
                 
-                gpText = `<div class="waisheng-label absolute ${positionClass} top-0 bg-amber-50 text-amber-900 px-2.5 py-1.5 rounded-md shadow border border-amber-300 text-left z-20 w-max max-w-[140px] break-words text-[11px] pointer-events-none">
+                gpText = `<div class="waisheng-label absolute ${positionClass} top-0 bg-amber-50 text-amber-900 px-2.5 py-1.5 rounded-md shadow border border-amber-300 text-left z-20 w-max break-words text-[11px] pointer-events-none">
                             <div class="label-badge label-divider font-bold text-amber-700 ${node.waishengrenReason ? 'border-b border-amber-200 pb-1 mb-1' : ''}">外省背景</div>
                             ${reasonHtml}
                           </div>`;
@@ -1262,13 +1318,13 @@
             let adoptionLabel = "";
             if (node.adoptionStatus === 'adopted_in') {
                 let noteHtml = node.otherSystemNotes ? `<div class="text-[9px] font-normal mt-0.5 leading-tight text-emerald-800">${node.otherSystemNotes}</div>` : "";
-                adoptionLabel = `<div class="adoption-label absolute -top-10 -right-6 bg-emerald-50 text-emerald-900 px-1.5 py-1 rounded shadow-sm border border-emerald-300 text-left z-30 w-max max-w-[120px] break-words pointer-events-none">
+                adoptionLabel = `<div class="adoption-label absolute -top-10 -right-6 bg-emerald-50 text-emerald-900 px-1.5 py-1 rounded shadow-sm border border-emerald-300 text-left z-30 w-max break-words pointer-events-none">
                                     <span class="label-badge bg-emerald-600 text-white text-[10px] font-bold px-1 py-0.5 rounded-sm mr-0.5">收養</span>
                                     ${noteHtml}
                                  </div>`;
             } else if (node.adoptionStatus === 'given_away') {
                 let noteHtml = node.otherSystemNotes ? `<div class="text-[9px] font-normal mt-0.5 leading-tight text-purple-800">${node.otherSystemNotes}</div>` : "";
-                adoptionLabel = `<div class="adoption-label absolute -top-10 -right-6 bg-purple-50 text-purple-900 px-1.5 py-1 rounded shadow-sm border border-purple-300 text-left z-30 w-max max-w-[120px] break-words pointer-events-none">
+                adoptionLabel = `<div class="adoption-label absolute -top-10 -right-6 bg-purple-50 text-purple-900 px-1.5 py-1 rounded shadow-sm border border-purple-300 text-left z-30 w-max break-words pointer-events-none">
                                     <span class="label-badge bg-purple-600 text-white text-[10px] font-bold px-1 py-0.5 rounded-sm mr-0.5">出養</span>
                                     ${noteHtml}
                                  </div>`;
@@ -1285,7 +1341,7 @@
 
             let extraClasses = customClass;
             if (node.role === 'father' || node.role === 'mother' || node.role === 'client' || node.role === 'spouse') {
-                extraClasses += " mt-36";
+                extraClasses += " mt-vgap-role";
             }
 
             let onclickArgs = `'node', '${group}', '${node.id}'`;
@@ -1340,6 +1396,14 @@
         }
 
         function renderDOM() {
+            // 套用 Layout 設定
+            const layout = state.global.layout || { nodeScale: 1.4, textScale: 1.5, leftTextScale: 1.4, vGap: 8, hFamGap: 10, hSibGap: 1 };
+            document.documentElement.style.setProperty('--v-gap', `${layout.vGap}rem`);
+            document.documentElement.style.setProperty('--h-fam-gap', `${layout.hFamGap}rem`);
+            document.documentElement.style.setProperty('--h-sib-gap', `${layout.hSibGap}rem`);
+            document.documentElement.style.setProperty('--text-scale', layout.textScale);
+            document.documentElement.style.setProperty('--left-text-scale', layout.leftTextScale || 1.4);
+
             document.getElementById('global-events').value = state.global.majorEvents;
             document.getElementById('global-hidden').value = state.global.hiddenPeople;
             document.getElementById('global-notes').value = state.global.otherNotes || '';
@@ -1356,7 +1420,7 @@
             document.getElementById('paternal-children-container').innerHTML = 
                 renderManageButton('paternal', 'left') + pChildren.map(c => {
                     if (c.role === 'father') {
-                        let extraHtml = `<div class="mt-36 flex flex-col items-center no-print relative mr-4">
+                        let extraHtml = `<div class="mt-vgap-role flex flex-col items-center no-print relative mr-4">
                             <div class="absolute -top-7 text-[10px] font-bold text-gray-500 bg-white px-1.5 py-0.5 rounded border border-gray-200 shadow-sm whitespace-nowrap z-10 pointer-events-none">前/後配偶</div>
                             <button onclick="addParentSpouse('father')" class="btn-interactive flex items-center justify-center w-[64px] h-[64px] rounded-full border-2 border-dashed border-indigo-400 text-indigo-600 hover:text-white hover:bg-indigo-500 hover:border-indigo-500 transition shadow-sm bg-indigo-50" title="新增配偶"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
                             <div class="text-[11px] font-bold mt-2 text-center text-indigo-600 w-[90px]">新增配偶</div>
@@ -1377,7 +1441,7 @@
                         state.motherFamilies.forEach(fam => {
                             html += renderNodeHTML(fam.spouse, 'motherFamilies', fam.id);
                         });
-                        html += `<div class="mt-36 flex flex-col items-center no-print relative ml-4">
+                        html += `<div class="mt-vgap-role flex flex-col items-center no-print relative ml-4">
                             <div class="absolute -top-7 text-[10px] font-bold text-gray-500 bg-white px-1.5 py-0.5 rounded border border-gray-200 shadow-sm whitespace-nowrap z-10 pointer-events-none">前/後配偶</div>
                             <button onclick="addParentSpouse('mother')" class="btn-interactive flex items-center justify-center w-[64px] h-[64px] rounded-full border-2 border-dashed border-indigo-400 text-indigo-600 hover:text-white hover:bg-indigo-500 hover:border-indigo-500 transition shadow-sm bg-indigo-50" title="新增配偶"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
                             <div class="text-[11px] font-bold mt-2 text-center text-indigo-600 w-[90px]">新增配偶</div>
@@ -1395,7 +1459,7 @@
                     state.clientFamilies.forEach((fam, index) => {
                         clientHtml += renderNodeHTML(fam.spouse, 'clientFamilies', fam.id, 'ml-4');
                     });
-                    clientHtml += `<div class="mt-36 flex flex-col items-center no-print relative ml-4">
+                    clientHtml += `<div class="mt-vgap-role flex flex-col items-center no-print relative ml-4">
                         <div class="absolute -top-7 text-[10px] font-bold text-gray-500 bg-white px-1.5 py-0.5 rounded border border-gray-200 shadow-sm whitespace-nowrap z-10 pointer-events-none">配偶</div>
                         <button onclick="addSpouse()" class="btn-interactive flex items-center justify-center w-[64px] h-[64px] rounded-full border-2 border-dashed border-emerald-400 text-emerald-600 hover:text-white hover:bg-emerald-500 hover:border-emerald-500 transition shadow-sm bg-emerald-50" title="新增配偶"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
                         <div class="text-[11px] font-bold mt-2 text-center text-emerald-600 w-[90px]">新增配偶</div>
@@ -1407,7 +1471,7 @@
 
             let fatherExtraHtml = '';
             [...state.fatherFamilies].reverse().forEach((fam, idx) => {
-                fatherExtraHtml += `<div class="flex justify-center items-start gap-4">`;
+                fatherExtraHtml += `<div class="flex justify-center items-start gap-hsib">`;
                 fatherExtraHtml += renderManageButton('fatherFamilies', 'left', fam.id);
                 fatherExtraHtml += fam.children.map(c => renderNodeHTML(c, 'fatherFamilies', fam.id)).join('');
                 fatherExtraHtml += `</div>`;
@@ -1416,7 +1480,7 @@
 
             let motherExtraHtml = '';
             state.motherFamilies.forEach((fam, idx) => {
-                motherExtraHtml += `<div class="flex justify-center items-start gap-4">`;
+                motherExtraHtml += `<div class="flex justify-center items-start gap-hsib">`;
                 motherExtraHtml += fam.children.map(c => renderNodeHTML(c, 'motherFamilies', fam.id)).join('');
                 motherExtraHtml += renderManageButton('motherFamilies', 'right', fam.id);
                 motherExtraHtml += `</div>`;
@@ -1425,7 +1489,7 @@
 
             let cfChildrenHtml = '';
             state.clientFamilies.forEach((fam, idx) => {
-                cfChildrenHtml += `<div class="flex justify-center items-start gap-4">`;
+                cfChildrenHtml += `<div class="flex justify-center items-start gap-hsib">`;
                 cfChildrenHtml += fam.children.map(c => renderNodeHTML(c, 'clientFamilies', fam.id)).join('');
                 cfChildrenHtml += renderManageButton('clientFamilies', 'right', fam.id);
                 cfChildrenHtml += `</div>`;
@@ -1444,7 +1508,7 @@
                     relation = reason ? `${relation}<br><span class="font-normal text-[10px] text-gray-600">(${reason})</span>` : `${relation}<br><span class="font-normal text-[10px] text-gray-600">(分開/中斷)</span>`;
                 }
                 const glowClass = fam.marriage.isConfirmed ? '' : 'glow-gold';
-                dynamicLabelsHtml += `<div id="label-client-marriage-${fam.id}" class="absolute z-20 cursor-pointer text-[11px] font-medium text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-300 shadow-sm hover:ring-2 ring-emerald-400 transition text-center max-w-[140px] break-words whitespace-pre-wrap leading-tight ${glowClass}" onclick="openDrawer('marriage', 'clientFamilies', null, null, '${fam.id}')">${relation}</div>`;
+                dynamicLabelsHtml += `<div id="label-client-marriage-${fam.id}" class="absolute z-20 cursor-pointer text-xs font-medium text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-300 shadow-sm hover:ring-2 ring-emerald-400 transition text-center break-words whitespace-pre-wrap leading-tight ${glowClass}" onclick="openDrawer('marriage', 'clientFamilies', null, null, '${fam.id}')">${relation}</div>`;
             });
 
             state.fatherFamilies.forEach((fam, idx) => {
@@ -1453,7 +1517,7 @@
                     relation = fam.marriage.divorceAge ? `${relation}<br><span class="font-normal text-[10px] text-gray-600">(分開時爸爸${fam.marriage.divorceAge}歲)</span>` : `${relation}<br><span class="font-normal text-[10px] text-gray-600">(分開/中斷)</span>`;
                 }
                 const glowClass = fam.marriage.isConfirmed ? '' : 'glow-gold';
-                dynamicLabelsHtml += `<div id="label-father-marriage-${fam.id}" class="absolute z-20 cursor-pointer text-[11px] font-medium text-indigo-800 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-300 shadow-sm hover:ring-2 ring-indigo-400 transition text-center max-w-[140px] break-words whitespace-pre-wrap leading-tight ${glowClass}" onclick="openDrawer('marriage', 'fatherFamilies', null, null, '${fam.id}')">${relation}</div>`;
+                dynamicLabelsHtml += `<div id="label-father-marriage-${fam.id}" class="absolute z-20 cursor-pointer text-xs font-medium text-indigo-800 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-300 shadow-sm hover:ring-2 ring-indigo-400 transition text-center break-words whitespace-pre-wrap leading-tight ${glowClass}" onclick="openDrawer('marriage', 'fatherFamilies', null, null, '${fam.id}')">${relation}</div>`;
             });
 
             state.motherFamilies.forEach((fam, idx) => {
@@ -1462,7 +1526,7 @@
                     relation = fam.marriage.divorceAge ? `${relation}<br><span class="font-normal text-[10px] text-gray-600">(分開時媽媽${fam.marriage.divorceAge}歲)</span>` : `${relation}<br><span class="font-normal text-[10px] text-gray-600">(分開/中斷)</span>`;
                 }
                 const glowClass = fam.marriage.isConfirmed ? '' : 'glow-gold';
-                dynamicLabelsHtml += `<div id="label-mother-marriage-${fam.id}" class="absolute z-20 cursor-pointer text-[11px] font-medium text-indigo-800 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-300 shadow-sm hover:ring-2 ring-indigo-400 transition text-center max-w-[140px] break-words whitespace-pre-wrap leading-tight ${glowClass}" onclick="openDrawer('marriage', 'motherFamilies', null, null, '${fam.id}')">${relation}</div>`;
+                dynamicLabelsHtml += `<div id="label-mother-marriage-${fam.id}" class="absolute z-20 cursor-pointer text-xs font-medium text-indigo-800 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-300 shadow-sm hover:ring-2 ring-indigo-400 transition text-center break-words whitespace-pre-wrap leading-tight ${glowClass}" onclick="openDrawer('marriage', 'motherFamilies', null, null, '${fam.id}')">${relation}</div>`;
             });
 
             document.getElementById('dynamic-labels-container').innerHTML = dynamicLabelsHtml;
@@ -1508,7 +1572,6 @@
 
             let paths = '';
 
-            // 讓 SVG 畫布比 draw-area 更寬，避免右側成員較多時，最右側線段被 SVG 自身寬度裁切。
             svg.setAttribute('viewBox', '0 0 3200 2600');
             svg.setAttribute('preserveAspectRatio', 'none');
             svg.style.width = '3200px';
@@ -1568,7 +1631,6 @@
                 const firstX = Math.min(...targets.map(t => t.x), midX);
                 const lastX = Math.max(...targets.map(t => t.x), midX);
 
-                // 先畫每個孩子的垂直線，再畫橫向手足線，避免在高解析 PDF 中交會處看起來像斷掉。
                 targets.forEach(t => {
                     let strokeStyle = childStrokeProps;
                     if (t.node.adoptionStatus === 'adopted_in') {
@@ -2343,6 +2405,41 @@
             });
         }
 
+
+        function triggerImportJSON() {
+            closeModal();
+            const input = document.getElementById('import-json');
+            if (input) {
+                input.value = '';
+                input.click();
+            }
+        }
+
+        function showFileMenu() {
+            showModal({
+                title: '檔案',
+                message: `
+                    <div class="text-left space-y-3 leading-relaxed">
+                        <p class="text-sm text-gray-600">請選擇要進行的檔案操作：</p>
+                        <div class="grid grid-cols-1 gap-3">
+                            <button onclick="closeModal(); exportPDF();" class="w-full text-left px-4 py-3 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 font-bold transition">
+                                匯出 PDF
+                            </button>
+                            <button onclick="closeModal(); exportJSON();" class="w-full text-left px-4 py-3 rounded-xl border border-green-200 bg-green-50 hover:bg-green-100 text-green-700 font-bold transition">
+                                下載 JSON
+                            </button>
+                            <button onclick="triggerImportJSON();" class="w-full text-left px-4 py-3 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold transition">
+                                匯入 JSON
+                            </button>
+                        </div>
+                    </div>
+                `,
+                type: 'alert',
+                confirmText: '關閉',
+                modalWidth: 'min(92vw, 400px)'
+            });
+        }
+
         function exportJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
             const dl = document.createElement('a');
@@ -2361,15 +2458,6 @@
             state.global.facilitatorNotes = document.getElementById('global-facilitator-notes').value;
             state.global.clientName = document.getElementById('client-name').value;
             localStorage.setItem('genogram_draft', JSON.stringify(state));
-        }
-
-        function escapeHTML(str) {
-            return String(str || '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
         }
 
         function waitForNextPaint() {
@@ -2458,22 +2546,14 @@
         }
 
         async function waitForExportAssetsReady() {
-            // 等待 Google Fonts / Noto Sans TC 等字體完成，避免 GitHub Pages 上字體尚未載入就匯出。
             if (document.fonts && document.fonts.ready) {
                 try { await document.fonts.ready; } catch (_) {}
             }
-
-            // 等待目前頁面圖片與 SVG image 完成載入。
             const images = Array.from(document.images || []);
             await Promise.all(images.map(img => {
                 if (img.complete) return Promise.resolve();
-                return new Promise(resolve => {
-                    img.onload = resolve;
-                    img.onerror = resolve;
-                });
+                return new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
             }));
-
-            // 連續等待數次 repaint，讓 clone 後的 flex / SVG / canvas 座標在各環境一致。
             await waitForNextPaint();
             await waitForNextPaint();
         }
@@ -2481,11 +2561,7 @@
         async function exportPDF() {
             try {
                 if (!window.html2canvas || !window.jspdf) {
-                    showModal({
-                        title: '無法匯出 PDF',
-                        message: 'PDF 匯出工具尚未載入完成。請確認網路連線後重新整理頁面，再試一次。',
-                        type: 'alert'
-                    });
+                    showModal({ title: '無法匯出 PDF', message: 'PDF 匯出工具尚未載入完成。請確認網路連線後重新整理頁面，再試一次。', type: 'alert' });
                     return;
                 }
 
@@ -2500,11 +2576,7 @@
                 clonedDrawArea.style.transform = 'none';
                 clonedDrawArea.style.position = 'relative';
 
-                // PDF 匯出：保留 glow-gold 金色閃爍提示效果。
-                // 不移除 glow-gold、不停用 animation/filter；僅確保 SVG 外溢可見，避免圖樣被裁切。
-                clonedDrawArea.querySelectorAll('svg').forEach(svg => {
-                    svg.style.overflow = 'visible';
-                });
+                clonedDrawArea.querySelectorAll('svg').forEach(svg => { svg.style.overflow = 'visible'; });
 
                 const exportRoot = document.createElement('div');
                 exportRoot.className = 'pdf-export-root';
@@ -2541,7 +2613,6 @@
                 exportRoot.querySelector('.pdf-chart-stage').appendChild(clonedDrawArea);
                 document.body.appendChild(exportRoot);
 
-                // 固定 clone 後的尺寸，避免不同瀏覽器環境因 flex / viewport 計算差異造成 SVG 裁切。
                 clonedDrawArea.style.width = '2200px';
                 clonedDrawArea.style.minWidth = '2200px';
                 clonedDrawArea.style.height = 'auto';
@@ -2551,7 +2622,6 @@
                 });
 
                 await waitForExportAssetsReady();
-                // PDF 使用複製後的 draw-area 重新計算線段，避免沿用螢幕版座標造成右側線段斷裂或偏移。
                 redrawSVGLinesInDrawArea(clonedDrawArea);
                 await waitForNextPaint();
                 normalizePDFLabelPositions(exportRoot);
@@ -2562,18 +2632,9 @@
                 const exportWidth = 2200;
                 const exportHeight = 1538;
                 const canvas = await html2canvas(exportRoot, {
-                    backgroundColor: '#fdfbf7',
-                    scale: 3,
-                    useCORS: true,
-                    allowTaint: true,
-                    logging: false,
-                    foreignObjectRendering: false,
-                    width: exportWidth,
-                    height: exportHeight,
-                    windowWidth: exportWidth,
-                    windowHeight: exportHeight,
-                    scrollX: 0,
-                    scrollY: 0
+                    backgroundColor: '#fdfbf7', scale: 3, useCORS: true, allowTaint: true,
+                    logging: false, foreignObjectRendering: false, width: exportWidth, height: exportHeight,
+                    windowWidth: exportWidth, windowHeight: exportHeight, scrollX: 0, scrollY: 0
                 });
 
                 exportRoot.remove();
@@ -2609,11 +2670,7 @@
                 console.error('PDF 匯出失敗：', error);
                 const existingRoot = document.querySelector('.pdf-export-root');
                 if (existingRoot) existingRoot.remove();
-                showModal({
-                    title: '匯出失敗',
-                    message: 'PDF 產生時發生問題。請先儲存 JSON 備份，重新整理頁面後再試一次。',
-                    type: 'alert'
-                });
+                showModal({ title: '匯出失敗', message: 'PDF 產生時發生問題。請先儲存 JSON 備份，重新整理頁面後再試一次。', type: 'alert' });
             }
         }
 
@@ -2651,11 +2708,12 @@
                         if(!loaded.clientFamilies) loaded.clientFamilies = [];
                         if(!loaded.fatherFamilies) loaded.fatherFamilies = [];
                         if(!loaded.motherFamilies) loaded.motherFamilies = [];
-                        if(!loaded.global) loaded.global = { majorEvents: '', hiddenPeople: '', otherNotes: '', expectation: '', facilitatorNotes: '', clientName: '' };
+                        if(!loaded.global) loaded.global = { majorEvents: '', hiddenPeople: '', otherNotes: '', expectation: '', facilitatorNotes: '', clientName: '', layout: { nodeScale: 1.4, textScale: 1.5, leftTextScale: 1.4, vGap: 8, hFamGap: 10, hSibGap: 1, presetVersion: 2 } };
                         if(loaded.global.clientName === undefined) loaded.global.clientName = '';
                         if(loaded.global.otherNotes === undefined) loaded.global.otherNotes = '';
                         if(loaded.global.expectation === undefined) loaded.global.expectation = '';
                         if(loaded.global.facilitatorNotes === undefined) loaded.global.facilitatorNotes = '';
+                        if(loaded.global.layout === undefined) loaded.global.layout = { nodeScale: 1, textScale: 1, vGap: 8, hFamGap: 10, hSibGap: 1 };
                         state = loaded;
                         pushHistory();
                         renderDOM();
