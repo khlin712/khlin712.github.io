@@ -15,6 +15,104 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../style.css" />
+    <style>
+      .site-nav a.is-current {
+        color: var(--brand);
+        font-weight: 700;
+      }
+
+      .about-hero {
+        min-height: 84vh;
+      }
+
+      .about-hero-content {
+        max-width: 920px;
+      }
+
+      .about-intro {
+        padding-bottom: 64px;
+      }
+
+      .about-grid,
+      .practice-grid,
+      .method-panel {
+        display: grid;
+        gap: 24px;
+      }
+
+      .about-grid {
+        grid-template-columns: 0.9fr 1.1fr;
+        gap: 48px;
+        align-items: start;
+      }
+
+      .about-lead h2,
+      .method-panel h2 {
+        margin: 0;
+        font-family: "Newsreader", serif;
+        font-size: clamp(2rem, 5vw, 3rem);
+        line-height: 1.15;
+      }
+
+      .about-copy,
+      .method-list {
+        display: grid;
+        gap: 18px;
+      }
+
+      .about-copy p,
+      .method-list p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .practice-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .practice-card,
+      .method-panel {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: var(--shadow);
+      }
+
+      .practice-card {
+        padding: 28px;
+      }
+
+      .practice-card h3 {
+        margin: 12px 0 10px;
+        font-size: 1.28rem;
+        line-height: 1.35;
+      }
+
+      .practice-card p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .method-panel {
+        grid-template-columns: 0.85fr 1.15fr;
+        gap: 40px;
+        padding: 36px;
+      }
+
+      .about-contact-card {
+        background:
+          linear-gradient(135deg, rgba(28, 75, 130, 0.1), rgba(184, 135, 70, 0.16)),
+          rgba(255, 255, 255, 0.96);
+      }
+
+      @media (max-width: 960px) {
+        .about-grid,
+        .practice-grid,
+        .method-panel {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
   </head>
   <body>
     <header class="site-header">
@@ -23,7 +121,7 @@
         <nav class="site-nav" aria-label="主選單">
           <a href="../">首頁</a>
           <a href="../#method">教學方法</a>
-          <a href="../#curriculum">課程內容</a>
+          <a href="../#courses">課程內容</a>
           <a class="is-current" href="./">自我介紹</a>
           <a href="#contact">聯絡合作</a>
         </nav>
