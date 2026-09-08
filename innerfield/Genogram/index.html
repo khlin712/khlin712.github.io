@@ -9,6 +9,42 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" referrerpolicy="no-referrer"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        .operation-dialog { margin: auto; width: min(92vw, 640px); max-height: 90dvh; overflow: auto; padding: 24px; border: 1px solid #cbd5e1; border-radius: 8px; }
+        .operation-dialog::backdrop { background: #0006; }
+        .operation-dialog h2 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+        .operation-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+        .operation-actions button, #btn-save-drawer + button { border: 1px solid #94a3b8; border-radius: 6px; padding: 8px 12px; min-height: 44px; }
+        .field-error { color: #b91c1c; font-size: 13px; margin-top: 6px; }
+        [aria-invalid="true"] { outline: 2px solid #b91c1c; }
+        button:disabled { opacity: .4; cursor: default; }
+        #draft-status, #export-status { font-size: 12px; color: #475569; max-width: 12em; }
+        #right-drawer > div:last-child { flex-shrink: 0; background: white; }
+        .node-selected > .relative { outline: 3px solid #2563eb; outline-offset: 5px; border-radius: 8px; }
+        [id^="label-"] { min-width: 44px; min-height: 28px; padding: 6px 10px !important; }
+        #sibling-slots-container button { min-width: 44px; min-height: 44px; }
+        .zoom-readout { min-width: 48px; text-align: center; font-size: 12px; color: #475569; font-variant-numeric: tabular-nums; }
+        .mobile-only { display: none !important; }
+        .pdf-preview-dialog { width: min(96vw, 1200px); max-width: 1200px; max-height: 94dvh; margin: auto; padding: 18px; border: 1px solid #cbd5e1; border-radius: 8px; background: white; }
+        .pdf-preview-dialog::backdrop { background: #0008; }
+        .pdf-preview-dialog img { display: block; width: 100%; max-height: 72dvh; object-fit: contain; background: #fdfbf7; border: 1px solid #e2e8f0; }
+        .pdf-preview-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .pdf-preview-actions button { min-height: 44px; padding: 8px 14px; border-radius: 6px; }
+        @media (max-width: 640px) {
+            #top-toolbar { padding: 8px 10px; gap: 8px; }
+            #top-toolbar > div:first-child { min-width: max-content; gap: 8px; }
+            #top-toolbar h1 { font-size: 16px; }
+            #top-toolbar h1 svg { display: none; }
+            #client-name { width: 7rem; }
+            #top-toolbar button, #left-sidebar button, #right-drawer button { min-height: 44px; }
+            #top-toolbar .toolbar-secondary-action { display: none; }
+            #toolbar-secondary-tools > .toolbar-advanced { display: none; }
+            .mobile-only { display: inline-flex !important; }
+            #left-sidebar { position: absolute; top: 0; bottom: 0; left: 0; height: 100%; z-index: 60; }
+            #right-drawer { width: min(92vw, 22rem); }
+            #right-drawer .p-5 { padding: 16px; }
+            .operation-dialog { padding: 18px; }
+            .top-toolbar-scroll-hint { display: none; }
+        }
         :root {
             --v-gap: 8rem;
             --h-fam-gap: 10rem;
@@ -267,28 +303,32 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"></path></svg>
                     </button>
                 </div>
-                <button onclick="clearAll()" class="flex items-center px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition shadow-sm" title="清空所有資料">
+                <button onclick="clearAll()" class="toolbar-secondary-action flex items-center px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition shadow-sm" title="清空所有資料">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                     清空重置
                 </button>
             </div>
         </div>
-        <div class="flex items-center space-x-2 shrink-0">
-            <button onclick="showUsageNotice()" class="px-3 py-1.5 text-sm font-extrabold text-amber-700 bg-amber-50 border-2 border-amber-300 rounded-lg hover:bg-amber-100 transition shadow-sm" title="使用聲明" aria-label="使用聲明">！</button>
-            <button onclick="showOperationGuide()" class="operation-guide-button px-3 py-1.5 text-sm font-bold text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition" title="操作說明">操作說明</button>
+        <div id="toolbar-secondary-tools" class="flex items-center space-x-2 shrink-0">
+            <button onclick="showUsageNotice()" class="toolbar-advanced toolbar-secondary-action px-3 py-1.5 text-sm font-extrabold text-amber-700 bg-amber-50 border-2 border-amber-300 rounded-lg hover:bg-amber-100 transition shadow-sm" title="使用聲明" aria-label="使用聲明">！</button>
+            <button onclick="showOperationGuide()" class="toolbar-advanced toolbar-secondary-action operation-guide-button px-3 py-1.5 text-sm font-bold text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition" title="操作說明">操作說明</button>
             
-            <button onclick="openLayoutModal()" class="px-3 py-1.5 text-sm font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition shadow-sm" title="版面與圖形大小設定">
+            <button onclick="openLayoutModal()" class="toolbar-advanced toolbar-secondary-action px-3 py-1.5 text-sm font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition shadow-sm" title="版面與圖形大小設定">
                 <svg class="w-4 h-4 mr-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 版面調整
             </button>
 
-            <button onclick="zoomIn()" class="p-2 text-gray-600 hover:bg-gray-100 rounded" title="放大"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg></button>
-            <button onclick="zoomOut()" class="p-2 text-gray-600 hover:bg-gray-100 rounded" title="縮小"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path></svg></button>
+            <button onclick="zoomIn()" class="toolbar-advanced toolbar-secondary-action p-2 text-gray-600 hover:bg-gray-100 rounded" title="放大"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg></button>
+            <button onclick="zoomOut()" class="toolbar-advanced toolbar-secondary-action p-2 text-gray-600 hover:bg-gray-100 rounded" title="縮小"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path></svg></button>
+            <span id="zoom-display" class="toolbar-advanced zoom-readout" role="status" aria-live="polite">100%</span>
+            <button onclick="fitToView()" class="toolbar-advanced toolbar-secondary-action px-2 py-1.5 text-xs font-bold text-slate-600 hover:bg-gray-100 rounded" title="顯示全圖">全圖</button>
+            <button onclick="focusClient()" class="toolbar-advanced toolbar-secondary-action px-2 py-1.5 text-xs font-bold text-slate-600 hover:bg-gray-100 rounded" title="定位當事人">定位</button>
             <div class="w-px h-6 bg-gray-300 mx-1"></div>
-            <button onclick="showFileMenu()" class="px-3 py-1.5 text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition shadow-sm" title="檔案操作">
+            <button onclick="showFileMenu()" class="toolbar-file-action px-3 py-1.5 text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition shadow-sm" title="檔案操作">
                 <svg class="w-4 h-4 mr-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"></path></svg>
                 檔案
             </button>
+            <button onclick="showMoreTools()" class="mobile-only px-3 py-1.5 text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-lg" title="更多工具">更多</button>
             <input type="file" id="import-json" class="hidden" accept=".json" onchange="importJSON(event)">
         </div>
         <div class="top-toolbar-scroll-hint" aria-hidden="true"></div>
@@ -632,8 +672,9 @@
         };
 
         let state = JSON.parse(JSON.stringify(defaultState));
+        let selectedNodeId = null;
         
-        const savedDraft = localStorage.getItem('genogram_draft');
+        const savedDraft = (() => { try { return localStorage.getItem('genogram_draft'); } catch (_) { return null; } })();
         if (savedDraft) {
             try {
                 const parsedData = JSON.parse(savedDraft);
@@ -723,14 +764,14 @@
             historyStack = historyStack.slice(0, historyIndex + 1);
             historyStack.push(JSON.stringify(state));
             historyIndex++;
-            localStorage.setItem('genogram_draft', JSON.stringify(state));
+            persistDraft();
         }
 
         function undo() {
             if (historyIndex > 0) {
                 historyIndex--;
                 state = JSON.parse(historyStack[historyIndex]);
-                localStorage.setItem('genogram_draft', JSON.stringify(state)); 
+                persistDraft();
                 renderDOM();
             }
         }
@@ -739,7 +780,7 @@
             if (historyIndex < historyStack.length - 1) {
                 historyIndex++;
                 state = JSON.parse(historyStack[historyIndex]);
-                localStorage.setItem('genogram_draft', JSON.stringify(state)); 
+                persistDraft();
                 renderDOM();
             }
         }
@@ -747,9 +788,10 @@
         pushHistory();
 
         document.addEventListener('keydown', (e) => {
+            if (e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
             if (e.ctrlKey || e.metaKey) {
-                if (e.key === 'z') { e.preventDefault(); undo(); }
-                if (e.key === 'y') { e.preventDefault(); redo(); }
+                if (e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
+                if (e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
             }
         });
 
@@ -1095,6 +1137,42 @@
         function applyTransform() {
             zoomWrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
             drawSVGLines();
+            updateZoomDisplay();
+        }
+
+        function updateZoomDisplay() {
+            const display = document.getElementById('zoom-display');
+            if (display) display.textContent = `${Math.round(scale * 100)}%`;
+        }
+
+        function clampPan() {
+            panX = Math.min(Math.max(panX, -2600), 800);
+            panY = Math.min(Math.max(panY, -1800), 500);
+        }
+
+        function fitToView() {
+            const drawArea = document.getElementById('draw-area');
+            if (!drawArea) return;
+            const wrapperX = Math.max(0, (3000 - drawArea.offsetWidth) / 2);
+            const wrapperY = drawArea.offsetTop || 128;
+            const contentWidth = Math.max(1, drawArea.offsetWidth);
+            const contentHeight = Math.max(1, drawArea.offsetHeight);
+            scale = Math.min(2.5, Math.max(0.4, Math.min((viewport.clientWidth - 40) / contentWidth, (viewport.clientHeight - 40) / contentHeight)));
+            panX = (viewport.clientWidth - contentWidth * scale) / 2 - wrapperX * scale;
+            panY = (viewport.clientHeight - contentHeight * scale) / 2 - wrapperY * scale;
+            clampPan();
+            applyTransform();
+        }
+
+        function focusClient() {
+            const client = document.getElementById('node-client_node');
+            if (!client) return;
+            const viewportRect = viewport.getBoundingClientRect();
+            const nodeRect = client.getBoundingClientRect();
+            panX += viewportRect.left + viewportRect.width / 2 - (nodeRect.left + nodeRect.width / 2);
+            panY += viewportRect.top + viewportRect.height / 2 - (nodeRect.top + nodeRect.height / 2);
+            clampPan();
+            applyTransform();
         }
 
         viewport.addEventListener('mousedown', (e) => {
@@ -1339,7 +1417,7 @@
                 relationLabel = `<div class="absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] font-bold text-gray-500 bg-white px-1.5 py-0.5 rounded border border-gray-200 shadow-sm whitespace-nowrap z-10 pointer-events-none">${roleMap[node.relationOption]}</div>`;
             }
 
-            let extraClasses = customClass;
+            let extraClasses = `${customClass} ${selectedNodeId === node.id ? 'node-selected' : ''}`;
             if (node.role === 'father' || node.role === 'mother' || node.role === 'client' || node.role === 'spouse') {
                 extraClasses += " mt-vgap-role";
             }
@@ -1915,6 +1993,8 @@
                         <select id="sibling-slot-${i}" class="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 bg-gray-50 hover:bg-white transition cursor-pointer">
                             ${optionsHTML}
                         </select>
+                        <button type="button" class="p-2 text-gray-500 hover:bg-gray-100 rounded" onclick="moveSiblingSlot(${i}, -1)" title="上移第 ${i+1} 位" aria-label="上移第 ${i+1} 位">↑</button>
+                        <button type="button" class="p-2 text-gray-500 hover:bg-gray-100 rounded" onclick="moveSiblingSlot(${i}, 1)" title="下移第 ${i+1} 位" aria-label="下移第 ${i+1} 位">↓</button>
                     </div>
                 `;
             }
@@ -2003,6 +2083,16 @@
             if (state[group].husband?.id === id) return state[group].husband;
             if (state[group].wife?.id === id) return state[group].wife;
             return state[group].children.find(c => c.id === id);
+        }
+
+        function moveSiblingSlot(index, direction) {
+            const otherIndex = index + direction;
+            if (otherIndex < 0 || otherIndex >= 20) return;
+            const current = document.getElementById(`sibling-slot-${index}`);
+            const other = document.getElementById(`sibling-slot-${otherIndex}`);
+            if (!current || !other) return;
+            [current.value, other.value] = [other.value, current.value];
+            current.focus();
         }
 
         function loadNodeDataToForm() {
@@ -2440,6 +2530,24 @@
             });
         }
 
+        function showMoreTools() {
+            showModal({
+                title: '更多工具',
+                message: `
+                    <div class="grid grid-cols-1 gap-2 text-left">
+                        <button onclick="closeModal(); showUsageNotice();" class="w-full px-4 py-3 rounded-lg border border-amber-200 bg-amber-50 text-amber-800 font-bold">使用聲明</button>
+                        <button onclick="closeModal(); showOperationGuide();" class="w-full px-4 py-3 rounded-lg border border-green-200 bg-green-50 text-green-800 font-bold">操作說明</button>
+                        <button onclick="closeModal(); openLayoutModal();" class="w-full px-4 py-3 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-800 font-bold">版面調整</button>
+                        <button onclick="closeModal(); fitToView();" class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 text-slate-800 font-bold">顯示全圖</button>
+                        <button onclick="closeModal(); focusClient();" class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 text-slate-800 font-bold">定位當事人</button>
+                    </div>
+                `,
+                type: 'alert',
+                confirmText: '關閉',
+                modalWidth: 'min(92vw, 400px)'
+            });
+        }
+
         function exportJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
             const dl = document.createElement('a');
@@ -2457,11 +2565,20 @@
             state.global.expectation = document.getElementById('global-expectation').value;
             state.global.facilitatorNotes = document.getElementById('global-facilitator-notes').value;
             state.global.clientName = document.getElementById('client-name').value;
-            localStorage.setItem('genogram_draft', JSON.stringify(state));
+            persistDraft();
         }
 
         function waitForNextPaint() {
             return new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        }
+
+        async function waitForPDFReady() {
+            if (document.fonts && document.fonts.ready) {
+                try { await document.fonts.ready; } catch (_) {}
+            }
+            await waitForNextPaint();
+            await waitForNextPaint();
+            await new Promise(resolve => setTimeout(resolve, 150));
         }
 
         function normalizePDFLabelPositions(exportRoot) {
@@ -2558,15 +2675,78 @@
             await waitForNextPaint();
         }
 
+        let pdfExportInProgress = false;
+        let lastPDFCanvas = null;
+
+        function setExportStatus(message) {
+            const status = document.getElementById('export-status');
+            if (status) status.textContent = message;
+        }
+
+        function createPDFFromCanvas(canvas, filename) {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const margin = 4;
+            const usableWidth = pageWidth - margin * 2;
+            const usableHeight = pageHeight - margin * 2;
+            const imgData = canvas.toDataURL('image/png');
+            const imgRatio = canvas.width / canvas.height;
+            const pageRatio = usableWidth / usableHeight;
+            let imgWidth = usableWidth;
+            let imgHeight = usableHeight;
+            let offsetX = margin;
+            let offsetY = margin;
+            if (imgRatio > pageRatio) {
+                imgHeight = usableWidth / imgRatio;
+                offsetY = margin + (usableHeight - imgHeight) / 2;
+            } else {
+                imgWidth = usableHeight * imgRatio;
+                offsetX = margin + (usableWidth - imgWidth) / 2;
+            }
+            pdf.addImage(imgData, 'PNG', offsetX, offsetY, imgWidth, imgHeight, undefined, 'FAST');
+            pdf.save(filename);
+        }
+
+        function showPDFPreview(canvas, filename) {
+            const dialog = document.createElement('dialog');
+            dialog.className = 'pdf-preview-dialog';
+            dialog.innerHTML = `
+                <h2 class="text-lg font-bold text-slate-900 mb-2">PDF 匯出預覽</h2>
+                <p class="text-sm text-slate-600 mb-3">這是即將寫入 PDF 的畫面。確認版面後再下載。</p>
+                <img alt="PDF 匯出預覽">
+                <div class="pdf-preview-actions">
+                    <button type="button" class="border border-slate-300 text-slate-700" data-action="close">返回編輯</button>
+                    <button type="button" class="bg-red-600 text-white" data-action="download">下載 PDF</button>
+                </div>
+            `;
+            dialog.querySelector('img').src = canvas.toDataURL('image/png');
+            dialog.querySelector('[data-action="close"]').onclick = () => { dialog.close(); dialog.remove(); };
+            dialog.querySelector('[data-action="download"]').onclick = () => {
+                createPDFFromCanvas(canvas, filename);
+                setExportStatus('PDF 已下載');
+                dialog.close();
+                dialog.remove();
+            };
+            dialog.addEventListener('cancel', () => dialog.remove(), { once: true });
+            document.body.append(dialog);
+            dialog.showModal();
+        }
+
         async function exportPDF() {
+            if (pdfExportInProgress) return;
+            pdfExportInProgress = true;
+            setExportStatus('PDF 處理中');
             try {
                 if (!window.html2canvas || !window.jspdf) {
                     showModal({ title: '無法匯出 PDF', message: 'PDF 匯出工具尚未載入完成。請確認網路連線後重新整理頁面，再試一次。', type: 'alert' });
+                    setExportStatus('PDF 工具尚未載入');
                     return;
                 }
 
                 syncGlobalFieldsWithoutHistory();
-                closeDrawer();
+                if (!await guardDrawer()) return;
                 drawSVGLines();
                 await waitForExportAssetsReady();
 
@@ -2627,7 +2807,7 @@
                 normalizePDFLabelPositions(exportRoot);
                 await waitForNextPaint();
                 fitPDFChartToStage(exportRoot);
-                await waitForNextPaint();
+                await waitForPDFReady();
 
                 const exportWidth = 2200;
                 const exportHeight = 1538;
@@ -2639,38 +2819,17 @@
 
                 exportRoot.remove();
 
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                const margin = 4;
-                const usableWidth = pageWidth - margin * 2;
-                const usableHeight = pageHeight - margin * 2;
-
-                const imgData = canvas.toDataURL('image/png');
-                const imgRatio = canvas.width / canvas.height;
-                const pageRatio = usableWidth / usableHeight;
-
-                let imgWidth = usableWidth;
-                let imgHeight = usableHeight;
-                let offsetX = margin;
-                let offsetY = margin;
-
-                if (imgRatio > pageRatio) {
-                    imgHeight = usableWidth / imgRatio;
-                    offsetY = margin + (usableHeight - imgHeight) / 2;
-                } else {
-                    imgWidth = usableHeight * imgRatio;
-                    offsetX = margin + (usableWidth - imgWidth) / 2;
-                }
-
-                pdf.addImage(imgData, 'PNG', offsetX, offsetY, imgWidth, imgHeight, undefined, 'FAST');
-                pdf.save(`${getDynamicFileName()}.pdf`);
+                lastPDFCanvas = canvas;
+                showPDFPreview(canvas, `${getDynamicFileName()}.pdf`);
+                setExportStatus('PDF 預覽已準備');
             } catch (error) {
                 console.error('PDF 匯出失敗：', error);
                 const existingRoot = document.querySelector('.pdf-export-root');
                 if (existingRoot) existingRoot.remove();
                 showModal({ title: '匯出失敗', message: 'PDF 產生時發生問題。請先儲存 JSON 備份，重新整理頁面後再試一次。', type: 'alert' });
+                setExportStatus('PDF 匯出失敗');
+            } finally {
+                pdfExportInProgress = false;
             }
         }
 
@@ -2681,7 +2840,7 @@
             reader.onload = function(e) {
                 try {
                     const loaded = JSON.parse(e.target.result);
-                    if (loaded && loaded.paternal && loaded.client) {
+                    if (validateImportedState(loaded)) {
                         
                         if (loaded.paternal.marriage && !loaded.paternal.marriage.relation) loaded.paternal.marriage.relation = '祖父母';
                         if (loaded.maternal.marriage && !loaded.maternal.marriage.relation) loaded.maternal.marriage.relation = '外祖父母';
@@ -2714,9 +2873,7 @@
                         if(loaded.global.expectation === undefined) loaded.global.expectation = '';
                         if(loaded.global.facilitatorNotes === undefined) loaded.global.facilitatorNotes = '';
                         if(loaded.global.layout === undefined) loaded.global.layout = { nodeScale: 1, textScale: 1, vGap: 8, hFamGap: 10, hSibGap: 1 };
-                        state = loaded;
-                        pushHistory();
-                        renderDOM();
+                        confirmImportedState(loaded);
                     } else {
                         showModal({ title: '匯入失敗', message: '無效的檔案格式', type: 'alert' });
                     }
@@ -2726,6 +2883,202 @@
             };
             reader.readAsText(file);
         }
+
+        function persistDraft() {
+            const status = document.getElementById('draft-status');
+            try {
+                localStorage.setItem('genogram_draft', JSON.stringify(state));
+                if (status) status.textContent = '已儲存於此瀏覽器';
+                return true;
+            } catch (_) {
+                if (status) status.textContent = '儲存失敗';
+                return false;
+            }
+        }
+
+        function validateImportedState(data) {
+            if (!data || typeof data !== 'object') return false;
+            const nodeOK = n => !n || (typeof n === 'object' && !Array.isArray(n));
+            for (const key of ['paternal', 'maternal', 'client']) {
+                const family = data[key];
+                if (!family || !family.marriage || !Array.isArray(family.children) || !family.children.every(nodeOK)) return false;
+                if (key !== 'client' && (!nodeOK(family.husband) || !nodeOK(family.wife))) return false;
+            }
+            for (const key of ['clientFamilies', 'fatherFamilies', 'motherFamilies']) {
+                if (data[key] !== undefined && (!Array.isArray(data[key]) || !data[key].every(f => f && typeof f === 'object' && f.marriage && Array.isArray(f.children) && f.children.every(nodeOK)))) return false;
+            }
+            return !data.global || (typeof data.global === 'object' && Object.values(data.global).every(v => typeof v === 'string' || (v && typeof v === 'object')));
+        }
+
+        function choiceDialog(title, message, choices) {
+            const dialog = document.createElement('dialog');
+            dialog.className = 'operation-dialog';
+            const heading = document.createElement('h2');
+            heading.textContent = title;
+            const body = document.createElement('p');
+            body.textContent = message;
+            const actions = document.createElement('div');
+            actions.className = 'operation-actions';
+            dialog.append(heading, body, actions);
+            return new Promise(resolve => {
+                let done = false;
+                const finish = value => { if (done) return; done = true; dialog.close(); dialog.remove(); resolve(value); };
+                choices.forEach(([label, value]) => {
+                    const button = document.createElement('button');
+                    button.textContent = label;
+                    button.onclick = () => finish(value);
+                    actions.append(button);
+                });
+                dialog.addEventListener('cancel', e => { e.preventDefault(); finish(null); });
+                document.body.append(dialog);
+                dialog.showModal();
+            });
+        }
+
+        async function confirmImportedState(loaded) {
+            const nodes = new Set();
+            const visit = value => {
+                if (!value || typeof value !== 'object') return;
+                if (value.id && value.type) nodes.add(value.id);
+                Object.values(value).forEach(visit);
+            };
+            visit(loaded);
+            const answer = await choiceDialog('匯入家系圖', `當事人：${loaded.global.clientName || '未命名'}，${nodes.size} 位成員`, [['備份目前資料並匯入', 'backup'], ['直接匯入', 'import'], ['取消', null]]);
+            if (!answer || !await guardDrawer()) return;
+            updateGlobal();
+            if (answer === 'backup') exportJSON();
+            state = loaded;
+            pushHistory('匯入資料');
+            renderDOM();
+        }
+
+        let drawerBaseline = null;
+        let drawerGuardPending = false;
+        let draftTimer;
+        let actionLabel = '編輯資料';
+        const historyLabels = historyStack.map(() => '初始資料');
+        const snapshotDrawer = () => JSON.stringify(Array.from(drawer.querySelectorAll('input, textarea, select')).map(el => [el.id, el.value, el.checked]));
+        const originalCloseDrawer = closeDrawer;
+        async function guardDrawer() {
+            if (!drawer.classList.contains('drawer-open')) return true;
+            if (drawerBaseline === snapshotDrawer()) { originalCloseDrawer(); return true; }
+            if (drawerGuardPending) return false;
+            drawerGuardPending = true;
+            try {
+                const answer = await choiceDialog('尚未儲存的修改', '請選擇如何處理目前的編輯。', [['儲存並繼續', 'save'], ['捨棄修改', 'discard'], ['繼續編輯', null]]);
+                if (answer === 'save') return saveDrawer();
+                if (answer === 'discard') { drawerBaseline = null; originalCloseDrawer(); return true; }
+                return false;
+            } finally { drawerGuardPending = false; }
+        }
+        closeDrawer = () => guardDrawer();
+
+        const originalOpenDrawer = openDrawer;
+        openDrawer = async (...args) => {
+            if (!await guardDrawer()) return;
+            selectedNodeId = args[2] || null;
+            originalOpenDrawer(...args);
+            document.querySelectorAll('.node-selected').forEach(el => el.classList.remove('node-selected'));
+            if (selectedNodeId) document.getElementById(`node-${selectedNodeId}`)?.classList.add('node-selected');
+            if (window.matchMedia('(max-width: 640px)').matches && isLeftSidebarOpen) toggleLeftSidebar();
+            drawerBaseline = snapshotDrawer();
+            validateDrawerForm();
+        };
+        const originalOpenSiblingDrawer = openSiblingDrawer;
+        openSiblingDrawer = async (...args) => {
+            if (!await guardDrawer()) return;
+            selectedNodeId = null;
+            originalOpenSiblingDrawer(...args);
+            if (window.matchMedia('(max-width: 640px)').matches && isLeftSidebarOpen) toggleLeftSidebar();
+            drawerBaseline = snapshotDrawer();
+            validateDrawerForm();
+        };
+
+        validateDrawerForm = function(focus = false) {
+            drawer.querySelectorAll('.field-error').forEach(el => el.remove());
+            drawer.querySelectorAll('[aria-invalid]').forEach(el => { el.removeAttribute('aria-invalid'); el.removeAttribute('aria-describedby'); });
+            const errors = [];
+            const add = (id, message) => errors.push([document.getElementById(id), message]);
+            if (currentEditMode === 'node') {
+                const type = document.getElementById('edit-type').value;
+                const status = document.querySelector('[name="edit-status"]:checked')?.value;
+                if (['abortion', 'miscarriage'].includes(type)) {
+                    if (!document.getElementById('edit-dead-reason').value.trim()) add('edit-dead-reason', '請填寫流產／墮胎原因。');
+                } else if (status !== 'unknown') {
+                    const age = document.getElementById('edit-age');
+                    if (age.validity.badInput || (age.value && (!/^\d+$/.test(age.value) || Number(age.value) < 0))) add('edit-age', '請輸入零或正整數年齡。');
+                    if (status === 'alive' && !document.getElementById('edit-confirm-correct').checked) add('edit-confirm-correct', '請確認資料正確後儲存。');
+                }
+            } else if (currentEditMode === 'marriage' && !document.getElementById('edit-m-confirm-correct').checked) {
+                add('edit-m-confirm-correct', '請確認關係資料後儲存。');
+            } else if (currentEditMode === 'siblings' && !currentEditGroup.endsWith('Families')) {
+                if (Array.from(formSiblings.querySelectorAll('select')).filter(el => el.value === 'main').length !== 1) add('sibling-slot-0', '此世代必須有且只有一位主角。');
+            }
+            errors.forEach(([field, message]) => {
+                const error = document.createElement('p');
+                error.className = 'field-error'; error.id = `${field.id}-error`; error.textContent = message;
+                field.setAttribute('aria-invalid', 'true'); field.setAttribute('aria-describedby', error.id);
+                field.parentElement.append(error);
+            });
+            const button = document.getElementById('btn-save-drawer');
+            button.disabled = false;
+            button.classList.remove('bg-gray-400', 'hover:bg-gray-400', 'cursor-not-allowed', 'opacity-70');
+            button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            button.title = errors.length ? '請修正標示欄位後儲存' : '儲存修改';
+            if (focus && errors.length) errors[0][0].focus();
+            return errors.length === 0;
+        };
+        drawer.addEventListener('input', () => validateDrawerForm());
+        drawer.addEventListener('change', () => validateDrawerForm());
+        const originalSaveDrawer = saveDrawer;
+        saveDrawer = function() {
+            if (!validateDrawerForm(true)) return false;
+            actionLabel = currentEditMode === 'siblings' ? '調整手足順序' : '編輯成員或關係';
+            drawerBaseline = snapshotDrawer();
+            originalSaveDrawer();
+            drawerBaseline = null;
+            originalCloseDrawer();
+            return true;
+        };
+
+        const originalPushHistory = pushHistory;
+        pushHistory = function(label = actionLabel) {
+            if (historyStack[historyIndex] === JSON.stringify(state)) { persistDraft(); return; }
+            historyLabels.splice(historyIndex + 1);
+            originalPushHistory();
+            historyLabels[historyIndex] = label;
+            refreshHistoryButtons();
+            actionLabel = '編輯資料';
+        };
+        function refreshHistoryButtons() {
+            const back = document.querySelector('[onclick="undo()"]');
+            const forward = document.querySelector('[onclick="redo()"]');
+            back.disabled = historyIndex <= 0;
+            forward.disabled = historyIndex >= historyStack.length - 1;
+            back.title = back.disabled ? '沒有可復原的操作' : `復原：${historyLabels[historyIndex] || '編輯資料'}`;
+            forward.title = forward.disabled ? '沒有可重做的操作' : `重做：${historyLabels[historyIndex + 1] || '編輯資料'}`;
+        }
+        const originalUndo = undo, originalRedo = redo;
+        undo = async () => { if (await guardDrawer()) { clearTimeout(draftTimer); updateGlobal(); originalUndo(); refreshHistoryButtons(); } };
+        redo = async () => { if (await guardDrawer()) { originalRedo(); refreshHistoryButtons(); } };
+        const draftStatus = document.createElement('span');
+        draftStatus.id = 'draft-status'; draftStatus.setAttribute('role', 'status');
+        document.getElementById('client-name').after(draftStatus);
+        const exportStatus = document.createElement('span');
+        exportStatus.id = 'export-status'; exportStatus.setAttribute('role', 'status'); exportStatus.setAttribute('aria-live', 'polite');
+        document.getElementById('toolbar-secondary-tools').append(exportStatus);
+        const globalFields = document.querySelectorAll('#client-name, #left-sidebar textarea');
+        globalFields.forEach(field => {
+            field.addEventListener('input', () => {
+                draftStatus.textContent = '儲存中'; clearTimeout(draftTimer);
+                draftTimer = setTimeout(() => updateGlobal(), 500);
+            });
+            field.addEventListener('blur', () => { clearTimeout(draftTimer); updateGlobal(); });
+        });
+        const cancelEdit = document.createElement('button');
+        cancelEdit.textContent = '取消'; cancelEdit.onclick = () => closeDrawer();
+        document.getElementById('btn-save-drawer').after(cancelEdit);
+        persistDraft(); refreshHistoryButtons();
 
         window.onload = function() {
             renderDOM();
