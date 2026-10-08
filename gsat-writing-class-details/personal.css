@@ -3741,13 +3741,33 @@ body::before {
 
 /* Give desktop readers a stronger typographic scale without changing the mobile layout. */
 @media (min-width: 1100px) {
+  body {
+    font-size: 1.08rem;
+  }
+
+  .brand-copy strong {
+    font-size: 1.1rem;
+  }
+
+  .brand-copy small {
+    font-size: 0.64rem;
+  }
+
+  .site-nav {
+    font-size: 1.02rem;
+  }
+
   .section-kicker {
-    font-size: 0.88rem;
+    font-size: 1rem;
     letter-spacing: 0.1em;
   }
 
+  .section-heading h2 {
+    font-size: clamp(2.6rem, 5vw, 4.8rem);
+  }
+
   .section-heading > p:not(.section-kicker) {
-    font-size: 1.12rem;
+    font-size: 1.25rem;
   }
 
   .overview-card-number,
@@ -3758,59 +3778,95 @@ body::before {
   .contact-links-label,
   .annual-cta-label,
   .resource-heading .section-kicker {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .overview-card h3 {
-    font-size: clamp(1.85rem, 2.45vw, 2.65rem);
+    font-size: clamp(2rem, 2.45vw, 2.8rem);
   }
 
   .overview-card p,
   .trial-band p:not(.section-kicker),
   .result-card p,
   .detail-card p {
-    font-size: 1.08rem;
+    font-size: 1.18rem;
+  }
+
+  .trial-band h2 {
+    font-size: clamp(2.3rem, 4vw, 3.8rem);
   }
 
   .trial-band .button {
-    min-height: 60px;
+    min-height: 64px;
     min-width: 250px;
     padding-right: 28px;
     padding-left: 28px;
-    font-size: 1.12rem;
+    font-size: 1.25rem;
   }
 
   .result-card h3 {
-    font-size: clamp(1.9rem, 2.75vw, 2.8rem);
+    font-size: clamp(2.1rem, 2.75vw, 3.1rem);
   }
 
   .metric-row {
-    font-size: 1.08rem;
+    font-size: 1.18rem;
+  }
+
+  .metric-row strong {
+    font-size: clamp(1.5rem, 2.4vw, 2.1rem);
   }
 
   .result-card-note {
-    font-size: 0.98rem;
+    font-size: 1.08rem;
+  }
+
+  .feedback-card blockquote {
+    font-size: clamp(1.3rem, 2.15vw, 2rem);
   }
 
   .faq-list summary {
     padding: 21px 24px;
-    font-size: 1.12rem;
+    font-size: 1.22rem;
   }
 
   .faq-list details p {
     padding-right: 24px;
     padding-left: 24px;
-    font-size: 1rem;
+    font-size: 1.08rem;
+  }
+
+  .detail-card h3 {
+    font-size: clamp(1.5rem, 2.2vw, 1.95rem);
   }
 
   .resource-heading h3 {
-    font-size: clamp(1.75rem, 2.6vw, 2.25rem);
+    font-size: clamp(2rem, 2.6vw, 2.5rem);
   }
 
   .resource-link {
-    min-height: 60px;
+    min-height: 66px;
     padding-right: 18px;
     padding-left: 18px;
+    font-size: 1.18rem;
+  }
+
+  .annual-cta strong {
+    font-size: clamp(1.7rem, 2.7vw, 2.7rem);
+  }
+
+  .annual-cta small {
+    font-size: 1rem;
+  }
+
+  .contact-copy-refresh h2 {
+    font-size: clamp(2.3rem, 4vw, 3.8rem);
+  }
+
+  .contact-copy-refresh > p:not(.section-kicker) {
+    font-size: 1.18rem;
+  }
+
+  .contact-social-list a {
     font-size: 1.05rem;
   }
 }
